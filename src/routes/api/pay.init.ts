@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getViewer, SIGN_IN_REQUIRED } from "@/lib/entitlements.server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { ensureSchema, query } from "@/lib/db.server";
 import { PLAN_PRICE_KOBO, isPaidPlan } from "@/lib/plans";
 
 export const Route = createFileRoute("/api/pay/init")({
@@ -9,27 +9,18 @@ export const Route = createFileRoute("/api/pay/init")({
       POST: async ({ request }) => {
         const viewer = await getViewer(request);
         if (!viewer) return new Response(SIGN_IN_REQUIRED, { status: 401 });
-
         const { plan, callbackUrl } = (await request.json()) as {
           plan?: string;
           callbackUrl?: string;
         };
-        if (!plan || !isPaidPlan(plan)) {
-          return new Response("Invalid plan", { status: 400 });
-        }
-
+        if (!plan || !isPaidPlan(plan)) return new Response("Invalid plan", { status: 400 });
         const secret = process.env["PAYSTACK_SECRET_KEY"];
         if (!secret) return new Response("Payments are not configured.", { status: 500 });
-
         const amount = PLAN_PRICE_KOBO[plan];
         const reference = `farmx_${plan}_${viewer.userId.slice(0, 8)}_${Date.now()}`;
-
         const resp = await fetch("https://api.paystack.co/transaction/initialize", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${secret}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
           body: JSON.stringify({
             email: viewer.email,
             amount,
@@ -40,31 +31,21 @@ export const Route = createFileRoute("/api/pay/init")({
             metadata: { user_id: viewer.userId, plan },
           }),
         });
-
         const body = (await resp.json().catch(() => ({}))) as {
           status?: boolean;
           message?: string;
-          data?: { authorization_url?: string; reference?: string };
+          data?: { authorization_url?: string };
         };
-
         if (!resp.ok || !body.status || !body.data?.authorization_url) {
           console.error("Paystack init failed", resp.status, body.message);
           return new Response(body.message ?? "Could not start payment.", { status: 502 });
         }
-
-        await supabaseAdmin.from("payments").insert({
-          user_id: viewer.userId,
-          email: viewer.email,
-          reference,
-          plan,
-          amount_kobo: amount,
-          status: "pending",
-        });
-
-        return Response.json({
-          authorization_url: body.data.authorization_url,
-          reference,
-        });
+        await ensureSchema();
+        await query(
+          "INSERT INTO payments (reference, user_id, email, plan, amount_kobo, status) VALUES ($1, $2, $3, $4, $5, 'pending')",
+          [reference, viewer.userId, viewer.email, plan, amount],
+        );
+        return Response.json({ authorization_url: body.data.authorization_url, reference });
       },
     },
   },

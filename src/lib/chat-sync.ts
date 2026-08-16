@@ -1,5 +1,3 @@
-// FarmX AI — optional cloud sync for chat history (only when signed in)
-import { supabase } from "@/integrations/supabase/client";
 import type { ChatMessage } from "@/components/ChatWindow";
 import type { ThreadMeta } from "@/lib/chat-store";
 
@@ -11,61 +9,55 @@ export type RemoteThread = {
   messages: ChatMessage[];
 };
 
-async function currentUserId(): Promise<string | null> {
+async function authenticated() {
   try {
-    const { data } = await supabase.auth.getSession();
-    return data.session?.user?.id ?? null;
+    const response = await fetch("/api/auth", { credentials: "include", cache: "no-store" });
+    return response.ok && Boolean((await response.json()).authenticated);
   } catch {
-    return null;
+    return false;
   }
 }
 
-/** Push a thread to the cloud. Silent no-op when signed out. */
 export async function pushThread(meta: ThreadMeta, messages: ChatMessage[]): Promise<void> {
-  const userId = await currentUserId();
-  if (!userId) return;
+  if (!(await authenticated())) return;
   try {
-    await supabase.from("chat_threads").upsert(
-      {
+    await fetch("/api/threads", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         id: meta.id,
-        user_id: userId,
         title: meta.title,
-        pinned: !!meta.pinned,
-        messages: messages as unknown as never,
-        updated_at: new Date(meta.updatedAt || Date.now()).toISOString(),
-      },
-      { onConflict: "id" },
-    );
+        pinned: Boolean(meta.pinned),
+        updatedAt: meta.updatedAt,
+        messages,
+      }),
+    });
   } catch {
-    /* offline / not signed in — local copy stays authoritative */
+    /* local copy remains authoritative when offline */
   }
 }
 
 export async function removeThreadRemote(id: string): Promise<void> {
-  const userId = await currentUserId();
-  if (!userId) return;
+  if (!(await authenticated())) return;
   try {
-    await supabase.from("chat_threads").delete().eq("id", id).eq("user_id", userId);
+    await fetch(`/api/threads?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
   } catch {
-    /* ignore */
+    /* ignore offline errors */
   }
 }
 
-/** Fetch every cloud thread for the signed-in user. */
 export async function fetchRemoteThreads(): Promise<RemoteThread[]> {
-  const userId = await currentUserId();
-  if (!userId) return [];
-  const { data, error } = await supabase
-    .from("chat_threads")
-    .select("id, title, pinned, messages, updated_at")
-    .eq("user_id", userId)
-    .order("updated_at", { ascending: false });
-  if (error || !data) return [];
-  return data.map((row) => ({
-    id: row.id,
-    title: row.title,
-    pinned: !!row.pinned,
-    updatedAt: new Date(row.updated_at).getTime(),
-    messages: (row.messages ?? []) as unknown as ChatMessage[],
-  }));
+  if (!(await authenticated())) return [];
+  try {
+    const response = await fetch("/api/threads", { credentials: "include", cache: "no-store" });
+    if (!response.ok) return [];
+    const data = (await response.json()) as { threads?: RemoteThread[] };
+    return data.threads ?? [];
+  } catch {
+    return [];
+  }
 }

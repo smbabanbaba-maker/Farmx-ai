@@ -11,3 +11,13 @@
 - [x] Review the UI visually and verify responsive behavior
 - [x] Save a stable project checkpoint/version
 - [x] Push the completed code to the user-selected GitHub repository
+
+- [x] Remove Supabase client, auth middleware, generated types, and Supabase-only dependencies
+- [x] Replace Supabase authentication with Vercel-compatible application auth and secure session cookies
+- [x] Replace Supabase tables and queries with a Vercel-compatible database adapter and schema
+- [x] Migrate chat history, profiles, usage quotas, entitlements, and payment records to the new database layer
+- [x] Update all API routes and frontend data flows to use the new backend without Supabase imports
+- [x] Add Vercel environment-variable documentation and deployment configuration without committing secrets
+- [x] Add migration tests for auth, database helpers, chat history, and quota behavior
+- [x] Verify build, lint, unit tests, local Vercel-style runtime, and absence of Supabase references
+- [ ] Commit and push the Supabase-free Vercel migration to GitHub

@@ -1,5 +1,5 @@
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { isPaidPlan } from "@/lib/plans";
+import { ensureSchema, query } from "@/lib/db.server";
+import { isPaidPlan, type PlanId } from "@/lib/plans";
 
 export type PaystackTx = {
   status?: string;
@@ -10,49 +10,40 @@ export type PaystackTx = {
   metadata?: { plan?: string; user_id?: string };
 };
 
-/** Marks a payment successful and upgrades the buyer's plan for 30 days. */
 export async function applySuccessfulPayment(tx: PaystackTx): Promise<boolean> {
   const reference = tx.reference;
   if (!reference || tx.status !== "success") return false;
-
-  const { data: payment } = await supabaseAdmin
-    .from("payments")
-    .select("id, user_id, plan, status")
-    .eq("reference", reference)
-    .maybeSingle();
-
-  const plan = payment?.plan ?? tx.metadata?.plan;
+  await ensureSchema();
+  const result = await query<{ user_id: string; plan: string; status: string }>(
+    "SELECT user_id, plan, status FROM payments WHERE reference = $1",
+    [reference],
+  );
+  const payment = result.rows[0];
+  const plan = (payment?.plan ?? tx.metadata?.plan) as PlanId | undefined;
   const userId = payment?.user_id ?? tx.metadata?.user_id;
   if (!plan || !isPaidPlan(plan) || !userId) return false;
 
   if (payment?.status !== "success") {
-    await supabaseAdmin
-      .from("payments")
-      .update({
-        status: "success",
-        channel: tx.channel ?? null,
-        paid_at: tx.paid_at ?? new Date().toISOString(),
-      })
-      .eq("reference", reference);
+    await query(
+      "UPDATE payments SET status = 'success', channel = $2, paid_at = COALESCE($3::timestamptz, NOW()) WHERE reference = $1",
+      [reference, tx.channel ?? null, tx.paid_at ?? null],
+    );
   }
-
-  const expires = new Date();
-  expires.setDate(expires.getDate() + 30);
-  await supabaseAdmin
-    .from("profiles")
-    .update({ plan, plan_expires_at: expires.toISOString() })
-    .eq("id", userId);
-
+  await query(
+    "UPDATE profiles SET plan = $2, plan_expires_at = NOW() + INTERVAL '30 days' WHERE id = $1",
+    [userId, plan],
+  );
   return true;
 }
 
-/** Asks Paystack for the authoritative state of a transaction. */
 export async function verifyTransaction(reference: string): Promise<PaystackTx | null> {
   const secret = process.env["PAYSTACK_SECRET_KEY"];
   if (!secret) return null;
   const resp = await fetch(
     `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
-    { headers: { Authorization: `Bearer ${secret}` } },
+    {
+      headers: { Authorization: `Bearer ${secret}` },
+    },
   );
   if (!resp.ok) {
     console.error("Paystack verify failed", resp.status, await resp.text().catch(() => ""));

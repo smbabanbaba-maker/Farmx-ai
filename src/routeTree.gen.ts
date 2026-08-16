@@ -20,9 +20,15 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiAuthRouteImport } from './routes/api/auth'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiEntitlementRouteImport } from './routes/api/entitlement'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as ApiThreadsRouteImport } from './routes/api/threads'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
+import { Route as ApiAuthLoginRouteImport } from './routes/api/auth.login'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth.logout'
+import { Route as ApiAuthSignupRouteImport } from './routes/api/auth.signup'
 import { Route as ApiPayInitRouteImport } from './routes/api/pay.init'
 import { Route as ApiPayVerifyRouteImport } from './routes/api/pay.verify'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
@@ -82,9 +88,19 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthRoute = ApiAuthRouteImport.update({
+  id: '/api/auth',
+  path: '/api/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEntitlementRoute = ApiEntitlementRouteImport.update({
+  id: '/api/entitlement',
+  path: '/api/entitlement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
@@ -92,10 +108,30 @@ const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   path: '/api/generate-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiThreadsRoute = ApiThreadsRouteImport.update({
+  id: '/api/threads',
+  path: '/api/threads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   id: '/api/transcribe',
   path: '/api/transcribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
+const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => ApiAuthRoute,
 } as any)
 const ApiPayInitRoute = ApiPayInitRouteImport.update({
   id: '/api/pay/init',
@@ -126,9 +162,15 @@ export interface FileRoutesByFullPath {
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
+  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/entitlement': typeof ApiEntitlementRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
@@ -145,9 +187,15 @@ export interface FileRoutesByTo {
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
+  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/entitlement': typeof ApiEntitlementRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
@@ -165,9 +213,15 @@ export interface FileRoutesById {
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
+  '/api/auth': typeof ApiAuthRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/api/entitlement': typeof ApiEntitlementRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
@@ -186,9 +240,15 @@ export interface FileRouteTypes {
     | '/scan'
     | '/settings'
     | '/terms'
+    | '/api/auth'
     | '/api/chat'
+    | '/api/entitlement'
     | '/api/generate-image'
+    | '/api/threads'
     | '/api/transcribe'
+    | '/api/auth/login'
+    | '/api/auth/logout'
+    | '/api/auth/signup'
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
@@ -205,9 +265,15 @@ export interface FileRouteTypes {
     | '/scan'
     | '/settings'
     | '/terms'
+    | '/api/auth'
     | '/api/chat'
+    | '/api/entitlement'
     | '/api/generate-image'
+    | '/api/threads'
     | '/api/transcribe'
+    | '/api/auth/login'
+    | '/api/auth/logout'
+    | '/api/auth/signup'
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
@@ -224,9 +290,15 @@ export interface FileRouteTypes {
     | '/scan'
     | '/settings'
     | '/terms'
+    | '/api/auth'
     | '/api/chat'
+    | '/api/entitlement'
     | '/api/generate-image'
+    | '/api/threads'
     | '/api/transcribe'
+    | '/api/auth/login'
+    | '/api/auth/logout'
+    | '/api/auth/signup'
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
@@ -244,8 +316,11 @@ export interface RootRouteChildren {
   ScanRoute: typeof ScanRoute
   SettingsRoute: typeof SettingsRoute
   TermsRoute: typeof TermsRoute
+  ApiAuthRoute: typeof ApiAuthRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
+  ApiEntitlementRoute: typeof ApiEntitlementRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
+  ApiThreadsRoute: typeof ApiThreadsRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiPayInitRoute: typeof ApiPayInitRoute
   ApiPayVerifyRoute: typeof ApiPayVerifyRoute
@@ -331,11 +406,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth': {
+      id: '/api/auth'
+      path: '/api/auth'
+      fullPath: '/api/auth'
+      preLoaderRoute: typeof ApiAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/entitlement': {
+      id: '/api/entitlement'
+      path: '/api/entitlement'
+      fullPath: '/api/entitlement'
+      preLoaderRoute: typeof ApiEntitlementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/generate-image': {
@@ -345,12 +434,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/threads': {
+      id: '/api/threads'
+      path: '/api/threads'
+      fullPath: '/api/threads'
+      preLoaderRoute: typeof ApiThreadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/transcribe': {
       id: '/api/transcribe'
       path: '/api/transcribe'
       fullPath: '/api/transcribe'
       preLoaderRoute: typeof ApiTranscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/login': {
+      id: '/api/auth/login'
+      path: '/login'
+      fullPath: '/api/auth/login'
+      preLoaderRoute: typeof ApiAuthLoginRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
+    '/api/auth/signup': {
+      id: '/api/auth/signup'
+      path: '/signup'
+      fullPath: '/api/auth/signup'
+      preLoaderRoute: typeof ApiAuthSignupRouteImport
+      parentRoute: typeof ApiAuthRoute
     }
     '/api/pay/init': {
       id: '/api/pay/init'
@@ -376,6 +493,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ApiAuthRouteChildren {
+  ApiAuthLoginRoute: typeof ApiAuthLoginRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+}
+
+const ApiAuthRouteChildren: ApiAuthRouteChildren = {
+  ApiAuthLoginRoute: ApiAuthLoginRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthSignupRoute: ApiAuthSignupRoute,
+}
+
+const ApiAuthRouteWithChildren =
+  ApiAuthRoute._addFileChildren(ApiAuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -388,8 +520,11 @@ const rootRouteChildren: RootRouteChildren = {
   ScanRoute: ScanRoute,
   SettingsRoute: SettingsRoute,
   TermsRoute: TermsRoute,
+  ApiAuthRoute: ApiAuthRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
+  ApiEntitlementRoute: ApiEntitlementRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
+  ApiThreadsRoute: ApiThreadsRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
   ApiPayInitRoute: ApiPayInitRoute,
   ApiPayVerifyRoute: ApiPayVerifyRoute,

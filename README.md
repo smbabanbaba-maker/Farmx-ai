@@ -68,7 +68,7 @@ Bottom chat input should look similar to ChatGPT.
 
 Input Bar includes:
 
-+
+-
 
 Camera
 
@@ -390,9 +390,9 @@ Subscription
 
 ## Technical Stack
 
-React Native (Expo)
+TanStack Start + React + Vite
 
-Supabase
+Neon Postgres + Vercel cookie authentication
 
 AWS S3
 
@@ -440,9 +440,7 @@ Every screen must look modern, premium, minimal, and beautiful.
 
 The final product should be scalable and ready for Google Play Store and Apple App Store deployment.
 
-
-
-Dan uwa a hadamun wanan app din na AI Kuma Dan Allah yayi kyau sosai sanan da supabase zanyi amfani sanan ka kayatar dashi komai da komai kasamai abubuwa masu matukar kyau kamar a turai sannu asa ko wanne APi na komai da aka ambata a app din saboda kowanne abu aka tambaya ya dinga bada amsa yadda ya kamata sanna yazama kowanne yare na duniya yabani yadda yadace ya turo amsa profitinal amsa Wanda babu tarkace a ciki komai yazama na kwarai yazama kamar chatgpt yayi matukar kyau sa logona asamun a ciki
+Dan uwa a hadamun wanan app din na AI Kuma Dan Allah yayi kyau sosai sanan da Neon Postgres zanyi amfani sanan ka kayatar dashi komai da komai kasamai abubuwa masu matukar kyau kamar a turai sannu asa ko wanne APi na komai da aka ambata a app din saboda kowanne abu aka tambaya ya dinga bada amsa yadda ya kamata sanna yazama kowanne yare na duniya yabani yadda yadace ya turo amsa profitinal amsa Wanda babu tarkace a ciki komai yazama na kwarai yazama kamar chatgpt yayi matukar kyau sa logona asamun a ciki
 
 FarmX AI is a production-ready mobile-first agriculture assistant powered by Google Gemini, built by SYLUTION LTD.
 
@@ -459,19 +457,16 @@ npm i
 npm run dev
 ```
 
-
 ## Environment setup
 
 Copy the required values into your hosting provider’s secret manager. Never commit `.env` files or service-role keys.
 
-| Variable | Purpose |
-|---|---|
-| `SUPABASE_URL` and `VITE_SUPABASE_URL` | Supabase project URL for server and browser clients. |
-| `SUPABASE_PUBLISHABLE_KEY` and `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key for browser authentication and RLS-backed queries. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only key for trusted entitlement and payment operations. |
-| `BUILT_IN_FORGE_API_URL` and `BUILT_IN_FORGE_API_KEY` | Manus built-in AI provider credentials; when present, `/api/chat` uses Manus first. |
-| `MANUS_CHAT_MODEL` | Optional Manus model override; defaults to `gpt-5-mini`. |
-| `GEMINI_API_KEY` | Optional fallback for Gemini chat, image, and transcription capabilities. |
-| `PAYSTACK_SECRET_KEY` | Server-only Paystack payment verification and webhook secret. |
+| Variable                                              | Purpose                                                                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                        | Neon Postgres connection string injected by Vercel; used for auth, history, quotas, and payments. |
+| `BUILT_IN_FORGE_API_URL` and `BUILT_IN_FORGE_API_KEY` | Manus built-in AI provider credentials; when present, `/api/chat` uses Manus first.               |
+| `MANUS_CHAT_MODEL`                                    | Optional Manus model override; defaults to `gpt-5-mini`.                                          |
+| `GEMINI_API_KEY`                                      | Optional fallback for Gemini chat, image, and transcription capabilities.                         |
+| `PAYSTACK_SECRET_KEY`                                 | Server-only Paystack payment verification and webhook secret.                                     |
 
-The AI route keeps the existing farming prompt, quota checks, image-message support, and Supabase-backed history. It prefers Manus when the two Manus variables are available and falls back to Gemini when only the existing Gemini key is configured.
+The AI route keeps the existing farming prompt, quota checks, image-message support, and Neon Postgres + Vercel Auth-backed history. It prefers Manus when the two Manus variables are available and falls back to Gemini when only the existing Gemini key is configured.

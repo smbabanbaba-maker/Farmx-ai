@@ -40,7 +40,6 @@ import {
   type ThreadMeta,
 } from "@/lib/chat-store";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
 
 type ToolItem =
   | { label: string; icon: typeof Menu; kind: "route"; to: string }
@@ -150,7 +149,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const doLogout = async () => {
     if (typeof window === "undefined") return;
     if (!confirm("Log out of FarmX AI?")) return;
-    await supabase.auth.signOut();
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     clearLocalThreads();
     close();
     navigate({ to: "/" });
