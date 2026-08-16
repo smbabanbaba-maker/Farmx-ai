@@ -50,7 +50,10 @@ export const Route = createFileRoute("/api/chat")({
             } catch (quotaError) {
               // Keep guest chat available when the optional Neon quota store is not configured.
               // Authenticated requests still receive a clear JSON error below if their session store is unavailable.
-              console.warn("Guest quota store unavailable; continuing without persistence", quotaError);
+              console.warn(
+                "Guest quota store unavailable; continuing without persistence",
+                quotaError,
+              );
             }
           } else {
             const quota = await consumeQuota(viewer, hasImage ? "scans" : "messages");
@@ -59,7 +62,9 @@ export const Route = createFileRoute("/api/chat")({
         } catch (error) {
           console.error("Viewer or quota check failed", error);
           return Response.json(
-            { error: "Database is not configured. Connect Neon Postgres in Vercel, then redeploy." },
+            {
+              error: "Database is not configured. Connect Neon Postgres in Vercel, then redeploy.",
+            },
             { status: 503 },
           );
         }

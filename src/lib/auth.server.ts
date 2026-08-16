@@ -1,81 +1,119 @@
-import { randomBytes } from "node:crypto";
-import { hashToken, ensureSchema, newId, query } from "@/lib/db.server";
-
+const ACCESS_COOKIE = "farmx_access_token";
+const REFRESH_COOKIE = "farmx_refresh_token";
 const SESSION_COOKIE = "farmx_session";
-const SESSION_DAYS = 30;
 
-type UserRow = {
+type SupabaseAuthResponse = {
+  access_token?: string;
+  refresh_token?: string;
+  session?: { access_token: string; refresh_token: string };
+  user?: { id: string; email?: string | null };
+  error?: string;
+  error_description?: string;
+  msg?: string;
+};
+
+type SessionUser = {
   id: string;
   email: string;
-  password_hash?: string;
   plan?: string;
   plan_expires_at?: string | null;
 };
 
-function cookieValue(request: Request) {
+function getSupabaseConfig() {
+  const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) {
+    throw new Error(
+      "Supabase authentication is not configured. Add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.",
+    );
+  }
+  return { url: url.replace(/\/$/, ""), key };
+}
+
+function supabaseHeaders(accessToken?: string) {
+  const { key } = getSupabaseConfig();
+  return {
+    apikey: key,
+    Authorization: `Bearer ${accessToken ?? key}`,
+    "Content-Type": "application/json",
+  };
+}
+
+async function readAuthResponse(response: Response) {
+  const body = (await response.json().catch(() => ({}))) as SupabaseAuthResponse;
+  if (!response.ok) {
+    throw new Error(
+      body.error_description ?? body.msg ?? body.error ?? "Supabase authentication failed.",
+    );
+  }
+  return body;
+}
+
+function cookieValue(request: Request, name: string) {
   const cookie = request.headers.get("cookie") ?? "";
-  return cookie.match(new RegExp(`(?:^|; )${SESSION_COOKIE}=([^;]+)`))?.[1] ?? null;
+  return cookie.match(new RegExp(`(?:^|; )${name}=([^;]+)`))?.[1] ?? null;
 }
 
-export function bearerOrCookie(request: Request) {
-  const authorization = request.headers.get("authorization") ?? "";
-  return authorization.startsWith("Bearer ") ? authorization.slice(7).trim() : cookieValue(request);
+function cookieOptions(maxAge: number) {
+  return `Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Lax; ${process.env.NODE_ENV === "production" ? "Secure; " : ""}`;
 }
 
-export function sessionCookie(token: string, maxAge = SESSION_DAYS * 24 * 60 * 60) {
-  return `${SESSION_COOKIE}=${token}; Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Lax; ${process.env.NODE_ENV === "production" ? "Secure; " : ""}`;
+export function authCookies(accessToken: string, refreshToken: string) {
+  const options = cookieOptions(60 * 60 * 24 * 30);
+  return [
+    `${ACCESS_COOKIE}=${accessToken}; ${options}`,
+    `${REFRESH_COOKIE}=${refreshToken}; ${options}`,
+  ];
 }
 
-export async function createUser(email: string, passwordHash: string) {
-  await ensureSchema();
-  const id = newId();
-  const result = await query<UserRow>(
-    "INSERT INTO users (id, email, password_hash) VALUES ($1, $2, $3) RETURNING id, email",
-    [id, email, passwordHash],
-  );
-  await query("INSERT INTO profiles (id, email) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING", [
-    id,
-    email,
-  ]);
-  return result.rows[0];
+export function clearAuthCookies() {
+  const options = cookieOptions(0);
+  return [`${ACCESS_COOKIE}=; ${options}`, `${REFRESH_COOKIE}=; ${options}`];
 }
 
-export async function findUserByEmail(email: string) {
-  await ensureSchema();
-  const result = await query<UserRow>(
-    "SELECT id, email, password_hash FROM users WHERE email = $1",
-    [email],
-  );
-  return result.rows[0] ?? null;
+/** Backward-compatible test helper; application auth uses the two Supabase cookies above. */
+export function sessionCookie(token: string, maxAge = 60 * 60 * 24 * 30) {
+  return `${SESSION_COOKIE}=${token}; ${cookieOptions(maxAge)}`;
 }
 
-export async function createSession(userId: string) {
-  await ensureSchema();
-  const token = randomBytes(32).toString("base64url");
-  await query(
-    "INSERT INTO sessions (token_hash, user_id, expires_at) VALUES ($1, $2, NOW() + INTERVAL '30 days')",
-    [hashToken(token), userId],
-  );
-  return token;
+export async function signUpWithSupabase(email: string, password: string) {
+  const { url } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/signup`, {
+    method: "POST",
+    headers: supabaseHeaders(),
+    body: JSON.stringify({ email, password }),
+  });
+  return readAuthResponse(response);
 }
 
-export async function destroySession(request: Request) {
-  const token = bearerOrCookie(request);
-  if (token) await query("DELETE FROM sessions WHERE token_hash = $1", [hashToken(token)]);
+export async function signInWithSupabase(email: string, password: string) {
+  const { url } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: supabaseHeaders(),
+    body: JSON.stringify({ email, password }),
+  });
+  return readAuthResponse(response);
 }
 
-export async function getSessionUser(request: Request) {
-  const token = bearerOrCookie(request);
-  if (!token) return null;
-  await ensureSchema();
-  const result = await query<UserRow>(
-    `SELECT u.id, u.email, p.plan, p.plan_expires_at
-     FROM sessions s JOIN users u ON u.id = s.user_id
-     LEFT JOIN profiles p ON p.id = u.id
-     WHERE s.token_hash = $1 AND s.expires_at > NOW()`,
-    [hashToken(token)],
-  );
-  return result.rows[0] ?? null;
+export async function signOutFromSupabase(_request: Request) {
+  return undefined;
 }
 
-export { SESSION_COOKIE };
+export async function getSessionUser(request: Request): Promise<SessionUser | null> {
+  const accessToken = cookieValue(request, ACCESS_COOKIE);
+  if (!accessToken) return null;
+  const { url } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/user`, {
+    headers: supabaseHeaders(accessToken),
+  });
+  if (!response.ok) return null;
+  const body = (await response.json().catch(() => null)) as {
+    id?: string;
+    email?: string | null;
+  } | null;
+  if (!body?.id) return null;
+  return { id: body.id, email: body.email ?? "", plan: "free", plan_expires_at: null };
+}
+
+export { ACCESS_COOKIE, REFRESH_COOKIE };

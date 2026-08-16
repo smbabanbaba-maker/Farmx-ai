@@ -1,32 +1,47 @@
 import { createFileRoute } from "@tanstack/react-router";
-import bcrypt from "bcryptjs";
-import { createSession, createUser, findUserByEmail, sessionCookie } from "@/lib/auth.server";
+import { authCookies, signUpWithSupabase } from "@/lib/auth.server";
 
 export const Route = createFileRoute("/api/auth/signup")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json()) as { email?: unknown; password?: unknown };
-        const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-        const password = typeof body.password === "string" ? body.password : "";
-        if (!email || password.length < 6) {
+        try {
+          const body = (await request.json()) as { email?: unknown; password?: unknown };
+          const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+          const password = typeof body.password === "string" ? body.password : "";
+          if (!email || password.length < 6) {
+            return Response.json(
+              { error: "Enter a valid email and a password of at least 6 characters." },
+              { status: 400 },
+            );
+          }
+          const data = await signUpWithSupabase(email, password);
+          if (!data.user) {
+            return Response.json(
+              { error: "Supabase did not create the account." },
+              { status: 400 },
+            );
+          }
+          if (!data.session) {
+            return Response.json({
+              requiresEmailConfirmation: true,
+              user: { id: data.user.id, email },
+            });
+          }
+          const response = Response.json(
+            { user: { id: data.user.id, email } },
+            { headers: { "Cache-Control": "no-store" } },
+          );
+          for (const cookie of authCookies(data.session.access_token, data.session.refresh_token)) {
+            response.headers.append("Set-Cookie", cookie);
+          }
+          return response;
+        } catch (error) {
           return Response.json(
-            { error: "Enter a valid email and a password of at least 6 characters." },
+            { error: error instanceof Error ? error.message : "Unable to create account." },
             { status: 400 },
           );
         }
-        if (await findUserByEmail(email)) {
-          return Response.json(
-            { error: "An account with this email already exists." },
-            { status: 409 },
-          );
-        }
-        const user = await createUser(email, await bcrypt.hash(password, 12));
-        const token = await createSession(user.id);
-        return Response.json(
-          { user: { id: user.id, email: user.email } },
-          { headers: { "Set-Cookie": sessionCookie(token), "Cache-Control": "no-store" } },
-        );
       },
     },
   },

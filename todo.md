@@ -27,3 +27,13 @@
 - [x] Add the Nitro Vite plugin and TanStack Start Vercel framework detection so server routes stop returning 404
 - [x] Fix the FarmX AI farming-plan prompt error that renders “This page didn't load” instead of an AI response
 - [x] Verify the chat API response and error fallback in local and deployed environments
+
+- [ ] Restore Supabase database/auth integration using the connected project without committing secrets
+- [ ] Replace the AI provider path with Gemini API and keep server-side key handling
+- [ ] Migrate users, profiles, chat history, quotas, and payment persistence to Supabase
+- [ ] Verify Supabase schema, auth flow, Gemini chat, tests, and Vercel build
+- [ ] Push the Supabase + Gemini version to GitHub and trigger a Vercel deployment
+
+- [x] Diagnose the Vercel Supabase signup/login `Authentication failed` error
+- [x] Align auth routes, Supabase client configuration, redirect URL, and session persistence
+- [x] Add auth regression tests and verify signup, login, logout, and session restoration

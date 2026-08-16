@@ -40,8 +40,16 @@ function AuthPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), password }),
       });
-      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        requiresEmailConfirmation?: boolean;
+      };
       if (!response.ok) throw new Error(data.error ?? "Authentication failed.");
+      if (data.requiresEmailConfirmation) {
+        toast.success("Account created. Check your email to confirm it, then sign in.");
+        setMode("signin");
+        return;
+      }
       toast.success(mode === "signin" ? "Welcome back." : "Account created successfully.");
       navigate({ to: "/" });
       window.location.reload();
