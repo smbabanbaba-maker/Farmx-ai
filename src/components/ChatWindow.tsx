@@ -389,6 +389,14 @@ export function ChatWindow({
             <IconBtn onClick={() => cameraRef.current?.click()} title="Take photo">
               <Camera size={20} />
             </IconBtn>
+            <IconBtn
+              onClick={() =>
+                setInput((current) => (current.trim() ? `/image ${current.trim()}` : "/image "))
+              }
+              title="Create an AI image"
+            >
+              <Sparkles size={19} />
+            </IconBtn>
             <textarea
               ref={textareaRef}
               rows={1}
@@ -405,7 +413,7 @@ export function ChatWindow({
                   void send(input, pendingImage);
                 }
               }}
-              placeholder="Ask FarmX AI anything…"
+              placeholder="Ask FarmX AI anything… Type /image or tap ✨ to create a picture…"
               className="max-h-40 flex-1 resize-none bg-transparent px-1 py-2 text-sm outline-none placeholder:text-muted-foreground"
             />
             <IconBtn title="Voice conversation" onClick={openVoice}>

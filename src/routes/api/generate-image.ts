@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getAiKey, MISSING_KEY_MESSAGE } from "@/lib/ai-key.server";
 import { GEMINI_NATIVE_URL, GEMINI_IMAGE_MODEL } from "@/lib/gemini.server";
-import { consumeQuota, getViewer, SIGN_IN_REQUIRED } from "@/lib/entitlements.server";
-import { PLAN_LIMITS } from "@/lib/plans";
-
+import { generateFarmImage } from "@/lib/image-generation.server";
 type GeminiPart = { inlineData?: { mimeType?: string; data?: string } };
 
 export const Route = createFileRoute("/api/generate-image")({
@@ -15,18 +13,15 @@ export const Route = createFileRoute("/api/generate-image")({
           return new Response("prompt required", { status: 400 });
         }
 
-        const viewer = await getViewer(request);
-        if (!viewer) return new Response(SIGN_IN_REQUIRED, { status: 401 });
-
-        if (PLAN_LIMITS[viewer.plan].imagesPerDay === 0) {
-          return new Response(
-            "Ƙirƙirar hoto na shirin GO da PRO ne. / AI image generation is available on the GO and PRO plans.",
-            { status: 402 },
-          );
+        const farmPrompt = `Create a clear, useful agriculture visual for FarmX AI. ${prompt.trim()}. Avoid unsafe pesticide instructions, fake labels, and unreadable text.`;
+        if (process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY) {
+          try {
+            const url = await generateFarmImage(farmPrompt);
+            return Response.json({ url, provider: "manus" });
+          } catch (error) {
+            console.warn("Manus image generation failed; trying Gemini fallback", error);
+          }
         }
-
-        const quota = await consumeQuota(viewer, "messages");
-        if (!quota.ok) return new Response(quota.message, { status: 402 });
 
         const key = getAiKey();
         if (!key) return new Response(MISSING_KEY_MESSAGE, { status: 500 });
@@ -43,7 +38,7 @@ export const Route = createFileRoute("/api/generate-image")({
               contents: [
                 {
                   role: "user",
-                  parts: [{ text: `Agriculture / farming illustration. ${prompt}` }],
+                  parts: [{ text: farmPrompt }],
                 },
               ],
             }),
@@ -70,6 +65,7 @@ export const Route = createFileRoute("/api/generate-image")({
         if (!inline?.data) return new Response("No image returned.", { status: 502 });
         return Response.json({
           url: `data:${inline.mimeType ?? "image/png"};base64,${inline.data}`,
+          provider: "gemini",
         });
       },
     },

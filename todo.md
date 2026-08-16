@@ -37,3 +37,9 @@
 - [x] Diagnose the Vercel Supabase signup/login `Authentication failed` error
 - [x] Align auth routes, Supabase client configuration, redirect URL, and session persistence
 - [x] Add auth regression tests and verify signup, login, logout, and session restoration
+
+- [x] Add server-side AI image generation for farming diagrams, crop plans, and agriculture visuals
+- [x] Add a chat/image UI control with loading, success, and error states
+- [x] Add tests for the image-generation route and prompt handling
+- [x] Verify image generation locally and in Vercel production
+- [ ] Push the image-generation feature to GitHub and trigger a Vercel deployment
