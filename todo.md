@@ -20,4 +20,4 @@
 - [x] Add Vercel environment-variable documentation and deployment configuration without committing secrets
 - [x] Add migration tests for auth, database helpers, chat history, and quota behavior
 - [x] Verify build, lint, unit tests, local Vercel-style runtime, and absence of Supabase references
-- [ ] Commit and push the Supabase-free Vercel migration to GitHub
+- [x] Commit and push the Supabase-free Vercel migration to GitHub
