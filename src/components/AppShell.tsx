@@ -131,6 +131,90 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <strong>{user?.email ?? "Welcome to StitchLink"}</strong>
                 <p>{isAuthenticated ? "Your marketplace account" : "Browse as a guest"}</p>
               </div>
+              <p className="px-2 pt-3 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                Chat History
+              </p>
+              <ul className="space-y-0.5">
+                {filtered.length === 0 && (
+                  <li className="px-2 py-3 text-xs text-muted-foreground">No conversations yet.</li>
+                )}
+                {filtered.map((t) => {
+                  const isActive = activeThread === t.id;
+                  const isEditing = editing === t.id;
+                  return (
+                    <li key={t.id}>
+                      <div
+                        className={`group flex items-center gap-1 rounded-xl px-2 py-1.5 text-sm ${isActive ? "bg-[color:var(--surface-2)]" : "hover:bg-[color:var(--surface-2)]"}`}
+                      >
+                        {isEditing ? (
+                          <input
+                            autoFocus
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={() => {
+                              renameThread(t.id, editValue);
+                              setEditing(null);
+                              setThreads(listThreads());
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                              if (e.key === "Escape") setEditing(null);
+                            }}
+                            className="flex-1 bg-transparent px-1 py-1 text-sm outline-none"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => openThread(t.id)}
+                            className="flex flex-1 items-center gap-2 truncate text-left"
+                          >
+                            {t.pinned ? (
+                              <Pin size={12} className="shrink-0 text-primary" />
+                            ) : (
+                              <MessageSquare size={12} className="shrink-0 text-muted-foreground" />
+                            )}
+                            <span className="truncate">{t.title}</span>
+                          </button>
+                        )}
+                        <div className="flex opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+                          <button
+                            onClick={() => {
+                              togglePin(t.id);
+                              setThreads(listThreads());
+                            }}
+                            className="p-1 text-muted-foreground hover:text-foreground"
+                            title={t.pinned ? "Unpin" : "Pin"}
+                          >
+                            {t.pinned ? <PinOff size={13} /> : <Pin size={13} />}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditing(t.id);
+                              setEditValue(t.title);
+                            }}
+                            className="p-1 text-muted-foreground hover:text-foreground"
+                            title="Rename"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`Delete "${t.title}"?`)) {
+                                deleteThread(t.id);
+                                setThreads(listThreads());
+                                if (isActive) navigate({ to: "/", search: {} as never });
+                              }
+                            }}
+                            className="p-1 text-muted-foreground hover:text-destructive"
+                            title="Delete"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
             <button
               className="st-drawer-sell"

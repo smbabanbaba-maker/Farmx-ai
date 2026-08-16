@@ -53,3 +53,11 @@
 - [ ] Verify registration, login, logout, session restoration, and protected API behavior against the user's Supabase project
 - [x] Run unit tests, TypeScript checks, production build, and live endpoint checks
 - [ ] Push the corrected image and Supabase changes to GitHub
+
+# Current request — chat history controls and auth completion
+
+- [x] Add history actions to delete a chat, pin/unpin a chat, and rename a chat
+- [x] Persist history actions through the Supabase-backed threads API
+- [x] Fix registration, login, logout, and session restoration error handling
+- [x] Verify history and auth flows with tests and production build
+- [ ] Push the history/auth changes to GitHub

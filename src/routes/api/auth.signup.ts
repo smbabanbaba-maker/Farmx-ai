@@ -37,9 +37,16 @@ export const Route = createFileRoute("/api/auth/signup")({
           }
           return response;
         } catch (error) {
+          const message = error instanceof Error ? error.message : "Unable to create account.";
+          const isCooldown =
+            /security purposes|after \d+ seconds|rate limit|too many requests/i.test(message);
           return Response.json(
-            { error: error instanceof Error ? error.message : "Unable to create account." },
-            { status: 400 },
+            {
+              error: isCooldown
+                ? "Supabase yana neman ka jira kaɗan kafin sake register. Jira seconds 60, sannan ka gwada sau ɗaya kawai."
+                : message,
+            },
+            { status: isCooldown ? 429 : 400 },
           );
         }
       },

@@ -25,9 +25,16 @@ export const Route = createFileRoute("/api/auth/login")({
           }
           return response;
         } catch (error) {
+          const message = error instanceof Error ? error.message : "Unable to sign in.";
+          const isCooldown =
+            /security purposes|after \d+ seconds|rate limit|too many requests/i.test(message);
           return Response.json(
-            { error: error instanceof Error ? error.message : "Unable to sign in." },
-            { status: 401 },
+            {
+              error: isCooldown
+                ? "Supabase yana neman ka jira kaɗan kafin sake login. Jira seconds 60, sannan ka gwada sau ɗaya kawai."
+                : message,
+            },
+            { status: isCooldown ? 429 : 401 },
           );
         }
       },
