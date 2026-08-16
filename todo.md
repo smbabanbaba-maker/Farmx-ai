@@ -25,3 +25,5 @@
 - [x] Investigate the reported Vercel 404 for `farmx-ai-one.vercel.app` and identify the active deployment URL or missing domain assignment
 - [x] Re-test the corrected Vercel URL and document the exact next step if dashboard access or deployment logs are required
 - [x] Add the Nitro Vite plugin and TanStack Start Vercel framework detection so server routes stop returning 404
+- [x] Fix the FarmX AI farming-plan prompt error that renders “This page didn't load” instead of an AI response
+- [x] Verify the chat API response and error fallback in local and deployed environments

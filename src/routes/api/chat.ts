@@ -37,16 +37,31 @@ export const Route = createFileRoute("/api/chat")({
         const hasImage =
           Array.isArray(last?.content) && last.content.some((part) => part.type === "image_url");
 
-        const viewer = await getViewer(request);
-        if (!viewer) {
-          if (hasImage) return new Response(GUEST_IMAGE_MESSAGE, { status: 401 });
-          const guestId = request.headers.get("x-guest-id")?.trim();
-          if (!guestId) return new Response(SIGN_IN_REQUIRED, { status: 401 });
-          const guestQuota = await consumeGuestQuota(guestId);
-          if (!guestQuota.ok) return new Response(guestQuota.message, { status: 402 });
-        } else {
-          const quota = await consumeQuota(viewer, hasImage ? "scans" : "messages");
-          if (!quota.ok) return new Response(quota.message, { status: 402 });
+        let viewer: Awaited<ReturnType<typeof getViewer>>;
+        try {
+          viewer = await getViewer(request);
+          if (!viewer) {
+            if (hasImage) return new Response(GUEST_IMAGE_MESSAGE, { status: 401 });
+            const guestId = request.headers.get("x-guest-id")?.trim();
+            if (!guestId) return new Response(SIGN_IN_REQUIRED, { status: 401 });
+            try {
+              const guestQuota = await consumeGuestQuota(guestId);
+              if (!guestQuota.ok) return new Response(guestQuota.message, { status: 402 });
+            } catch (quotaError) {
+              // Keep guest chat available when the optional Neon quota store is not configured.
+              // Authenticated requests still receive a clear JSON error below if their session store is unavailable.
+              console.warn("Guest quota store unavailable; continuing without persistence", quotaError);
+            }
+          } else {
+            const quota = await consumeQuota(viewer, hasImage ? "scans" : "messages");
+            if (!quota.ok) return new Response(quota.message, { status: 402 });
+          }
+        } catch (error) {
+          console.error("Viewer or quota check failed", error);
+          return Response.json(
+            { error: "Database is not configured. Connect Neon Postgres in Vercel, then redeploy." },
+            { status: 503 },
+          );
         }
 
         const geminiKey = getAiKey();
@@ -96,12 +111,15 @@ export const Route = createFileRoute("/api/chat")({
           const message = error instanceof Error ? error.message : "AI service unavailable.";
           console.error("AI provider error", error);
           const status = message.includes("429") ? 429 : message.includes("402") ? 402 : 502;
-          return new Response(
-            status === 429
-              ? "Too many requests. Please wait a moment and try again."
-              : status === 402
-                ? "AI credits are exhausted. Please add credits and try again."
-                : "FarmX AI could not answer right now. Please try again.",
+          return Response.json(
+            {
+              error:
+                status === 429
+                  ? "Too many requests. Please wait a moment and try again."
+                  : status === 402
+                    ? "AI credits are exhausted. Please add credits and try again."
+                    : "FarmX AI could not answer right now. Please try again.",
+            },
             { status },
           );
         }
