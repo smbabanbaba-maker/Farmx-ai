@@ -1,22 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
-import { StitchLinkHome } from "@/components/StitchLinkHome";
+import { ChatWindow } from "@/components/ChatWindow";
 
-const searchSchema = z.object({ q: z.string().optional() });
+const searchSchema = z.object({
+  q: z.string().optional(),
+  c: z.string().optional(),
+});
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "StitchLink — Your Fashion Marketplace" },
+      { title: "FarmX AI — Your Intelligent Farming Assistant" },
       {
         name: "description",
         content:
-          "Discover clothing, fabrics, sewing materials, accessories and independent fashion shops across Nigeria.",
+          "FarmX AI is a premium AI assistant for agriculture — crop planning, plant disease diagnosis, irrigation design, fertilizer schedules, and multilingual farming advice.",
       },
-      { property: "og:title", content: "StitchLink — Your Fashion Marketplace" },
-      { property: "og:description", content: "Find pieces that feel like you." },
+      { property: "og:title", content: "FarmX AI — Your Intelligent Farming Assistant" },
+      {
+        property: "og:description",
+        content: "Chat with an AI agronomist. Diagnose diseases, plan crops, design irrigation.",
+      },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   validateSearch: searchSchema,
@@ -24,9 +31,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const { q, c } = Route.useSearch();
   return (
     <AppShell>
-      <StitchLinkHome />
+      <ChatWindow initialPrompt={q} threadId={c} />
     </AppShell>
   );
 }

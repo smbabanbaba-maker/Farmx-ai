@@ -60,4 +60,12 @@
 - [x] Persist history actions through the Supabase-backed threads API
 - [x] Fix registration, login, logout, and session restoration error handling
 - [x] Verify history and auth flows with tests and production build
-- [ ] Push the history/auth changes to GitHub
+- [x] Push the history/auth changes to GitHub
+
+# Current request — remove unrelated application code
+
+- [x] Audit GitHub files, routes, components, branding, and recent commits for non-FarmX application code
+- [x] Audit the live deployment for unrelated UI, routes, or metadata
+- [x] Remove only confirmed unrelated code and restore FarmX AI as the sole application
+- [x] Verify FarmX chat, image route, auth, history controls, branding, and navigation remain intact
+- [ ] Run tests and production build, then push the cleaned project to GitHub
