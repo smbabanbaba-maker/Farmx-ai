@@ -23,5 +23,5 @@
 - [x] Commit and push the Supabase-free Vercel migration to GitHub
 
 - [x] Investigate the reported Vercel 404 for `farmx-ai-one.vercel.app` and identify the active deployment URL or missing domain assignment
-- [ ] Re-test the corrected Vercel URL and document the exact next step if dashboard access or deployment logs are required
+- [x] Re-test the corrected Vercel URL and document the exact next step if dashboard access or deployment logs are required
 - [x] Add the Nitro Vite plugin and TanStack Start Vercel framework detection so server routes stop returning 404
