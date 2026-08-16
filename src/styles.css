@@ -1,0 +1,298 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-accent-purple: var(--accent-purple);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Monochrome by default — FarmX AI black & white theme */
+:root {
+  --radius: 1rem;
+  --background: oklch(0 0 0); /* pure black */
+  --foreground: oklch(1 0 0); /* pure white */
+  --surface: oklch(0.18 0 0);
+  --surface-2: oklch(0.25 0 0);
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(1 0 0);
+  --primary-foreground: oklch(0 0 0);
+  --accent-purple: oklch(1 0 0);
+  --secondary: oklch(0.25 0 0);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.25 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.25 0 0);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.45 0 0);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(1 0 0 / 45%);
+
+  --gradient-brand: linear-gradient(135deg, oklch(1 0 0), oklch(0.72 0 0));
+  --shadow-glow: 0 20px 60px -20px oklch(1 0 0 / 18%);
+  --shadow-card: 0 8px 30px -12px oklch(0 0 0 / 80%);
+}
+
+html,
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  color-scheme: dark;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+@utility brand-gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass-card {
+  background: color-mix(in oklab, var(--surface) 85%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+}
+
+/* Minimal markdown styling for chat bubbles */
+.prose-chat {
+  font-size: calc(1em * var(--chat-text-scale, 1));
+  line-height: calc(1.6 * var(--chat-spacing, 1));
+}
+.prose-chat > * + * {
+  margin-top: calc(0.15rem * var(--chat-spacing, 1));
+}
+.prose-chat p {
+  margin: calc(0.35rem * var(--chat-spacing, 1)) 0;
+}
+.prose-chat ul,
+.prose-chat ol {
+  padding-left: 1.15rem;
+  margin: 0.4rem 0;
+}
+.prose-chat li {
+  margin: calc(0.2rem * var(--chat-spacing, 1)) 0;
+}
+.prose-chat strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.prose-chat h1,
+.prose-chat h2,
+.prose-chat h3 {
+  font-weight: 600;
+  margin: 0.6rem 0 0.3rem;
+}
+.prose-chat h1 {
+  font-size: 1.15rem;
+}
+.prose-chat h2 {
+  font-size: 1.05rem;
+}
+.prose-chat h3 {
+  font-size: 1rem;
+}
+.prose-chat code {
+  background: var(--surface-2);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+  font-size: 0.85em;
+}
+.prose-chat pre {
+  background: var(--surface-2);
+  padding: 0.75rem;
+  border-radius: 0.6rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+.prose-chat a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* Mobile-safe markdown: nothing may overflow the phone screen */
+.prose-chat {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.prose-chat img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  display: block;
+  margin: 0.5rem 0;
+}
+.prose-chat pre {
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.78rem;
+}
+.prose-chat code {
+  overflow-wrap: anywhere;
+}
+.prose-chat hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0.9rem 0;
+}
+.prose-chat blockquote {
+  border-left: 2px solid var(--border);
+  padding-left: 0.75rem;
+  margin: 0.5rem 0;
+  color: var(--muted-foreground);
+}
+/* Tables degrade into stacked mobile cards */
+.prose-chat table {
+  width: 100%;
+  display: block;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.prose-chat thead {
+  display: none;
+}
+.prose-chat tbody,
+.prose-chat tr,
+.prose-chat td,
+.prose-chat th {
+  display: block;
+  width: 100%;
+}
+.prose-chat tr {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.4rem 0;
+}
+.prose-chat td,
+.prose-chat th {
+  padding: 0.15rem 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.prose-chat td:first-child,
+.prose-chat th:first-child {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* ---- FarmX AI answer layout: always full, always left aligned, never overflowing ---- */
+.chat-answer,
+.chat-answer * {
+  text-align: left !important;
+  max-width: 100%;
+}
+.chat-answer {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.chat-answer .answer-h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 1rem 0 0.4rem;
+}
+.chat-answer .answer-h2-bar {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  border-radius: 2px;
+  background: var(--foreground);
+  flex: 0 0 auto;
+}
+.chat-answer .answer-h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--foreground) 85%, transparent);
+  margin: 0.75rem 0 0.25rem;
+}
+/* GFM tables rendered as stacked mobile cards */
+.chat-answer .answer-table {
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
+}
+.chat-answer .answer-table > thead {
+  display: none;
+}
+.chat-answer .answer-table > tbody,
+.chat-answer .answer-table > tbody > tr,
+.chat-answer .answer-table td,
+.chat-answer .answer-table th {
+  display: block;
+  width: 100%;
+}
+.chat-answer .answer-table > tbody > tr {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  padding: 0.6rem 0.85rem;
+  margin: 0.45rem 0;
+}
+.chat-answer ul {
+  list-style: disc;
+  padding-left: 1.15rem;
+}
+.chat-answer ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.chat-answer li {
+  margin: 0.25rem 0;
+  padding-left: 0.15rem;
+}
+.chat-answer p {
+  margin: 0.4rem 0;
+}
