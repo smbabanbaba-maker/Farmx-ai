@@ -54,7 +54,9 @@ describe("Supabase auth helpers", () => {
 
   it("returns a confirmation-required signup response when Supabase has no session", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(JSON.stringify({ user: { id: "user-2", email: "new@example.com" } }), { status: 200 }),
+      new Response(JSON.stringify({ user: { id: "user-2", email: "new@example.com" } }), {
+        status: 200,
+      }),
     );
 
     const result = await signUpWithSupabase("new@example.com", "password123");
