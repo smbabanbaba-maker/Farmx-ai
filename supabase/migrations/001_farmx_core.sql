@@ -95,10 +95,10 @@ $$;
 
 grant execute on function public.increment_usage(text) to authenticated;
 
-enable row level security on public.profiles;
-enable row level security on public.chat_threads;
-enable row level security on public.usage_counters;
-enable row level security on public.payments;
+alter table public.profiles enable row level security;
+alter table public.chat_threads enable row level security;
+alter table public.usage_counters enable row level security;
+alter table public.payments enable row level security;
 
 drop policy if exists profiles_select_own on public.profiles;
 create policy profiles_select_own on public.profiles for select using (auth.uid() = id);
