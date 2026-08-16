@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getSessionUser } from "@/lib/auth.server";
-import { ensureSchema, query } from "@/lib/db.server";
+import { supabaseDataRequest } from "@/lib/supabase-data.server";
 
 export const Route = createFileRoute("/api/threads")({
   server: {
@@ -8,26 +8,32 @@ export const Route = createFileRoute("/api/threads")({
       GET: async ({ request }) => {
         const user = await getSessionUser(request);
         if (!user) return Response.json({ threads: [] }, { status: 401 });
-        await ensureSchema();
-        const result = await query<{
-          id: string;
-          title: string;
-          pinned: boolean;
-          updated_at: string;
-          messages: unknown[];
-        }>(
-          "SELECT id, title, pinned, updated_at, messages FROM chat_threads WHERE user_id = $1 ORDER BY updated_at DESC",
-          [user.id],
-        );
-        return Response.json({
-          threads: result.rows.map((row) => ({
-            id: row.id,
-            title: row.title,
-            pinned: row.pinned,
-            updatedAt: new Date(row.updated_at).getTime(),
-            messages: row.messages ?? [],
-          })),
-        });
+        try {
+          const rows = await supabaseDataRequest<
+            Array<{
+              id: string;
+              title: string;
+              pinned: boolean;
+              updated_at: string;
+              messages: unknown[];
+            }>
+          >(
+            request,
+            `chat_threads?user_id=eq.${encodeURIComponent(user.id)}&select=id,title,pinned,updated_at,messages&order=updated_at.desc`,
+          );
+          return Response.json({
+            threads: rows.map((row) => ({
+              id: row.id,
+              title: row.title,
+              pinned: row.pinned,
+              updatedAt: new Date(row.updated_at).getTime(),
+              messages: row.messages ?? [],
+            })),
+          });
+        } catch (error) {
+          console.warn("Supabase thread list unavailable", error);
+          return Response.json({ threads: [] });
+        }
       },
       POST: async ({ request }) => {
         const user = await getSessionUser(request);
@@ -39,33 +45,46 @@ export const Route = createFileRoute("/api/threads")({
           updatedAt?: number;
           messages?: unknown[];
         };
-        if (!body.id || !body.title || !Array.isArray(body.messages))
+        if (!body.id || !body.title || !Array.isArray(body.messages)) {
           return new Response("Invalid thread", { status: 400 });
-        await ensureSchema();
-        await query(
-          `INSERT INTO chat_threads (id, user_id, title, pinned, messages, updated_at)
-           VALUES ($1, $2, $3, $4, $5::jsonb, COALESCE($6::timestamptz, NOW()))
-           ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, pinned = EXCLUDED.pinned, messages = EXCLUDED.messages, updated_at = EXCLUDED.updated_at
-           WHERE chat_threads.user_id = $2`,
-          [
-            body.id,
-            user.id,
-            body.title.slice(0, 200),
-            Boolean(body.pinned),
-            JSON.stringify(body.messages),
-            body.updatedAt ? new Date(body.updatedAt).toISOString() : null,
-          ],
-        );
-        return Response.json({ ok: true });
+        }
+        try {
+          await supabaseDataRequest(request, "chat_threads", {
+            method: "POST",
+            headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+            body: JSON.stringify({
+              id: body.id,
+              user_id: user.id,
+              title: body.title.slice(0, 200),
+              pinned: Boolean(body.pinned),
+              messages: body.messages,
+              updated_at: body.updatedAt
+                ? new Date(body.updatedAt).toISOString()
+                : new Date().toISOString(),
+            }),
+          });
+          return Response.json({ ok: true });
+        } catch (error) {
+          console.error("Supabase thread save failed", error);
+          return new Response("Could not save thread", { status: 503 });
+        }
       },
       DELETE: async ({ request }) => {
         const user = await getSessionUser(request);
         if (!user) return new Response("Unauthorized", { status: 401 });
         const id = new URL(request.url).searchParams.get("id");
         if (!id) return new Response("Thread id required", { status: 400 });
-        await ensureSchema();
-        await query("DELETE FROM chat_threads WHERE id = $1 AND user_id = $2", [id, user.id]);
-        return Response.json({ ok: true });
+        try {
+          await supabaseDataRequest(
+            request,
+            `chat_threads?id=eq.${encodeURIComponent(id)}&user_id=eq.${encodeURIComponent(user.id)}`,
+            { method: "DELETE" },
+          );
+          return Response.json({ ok: true });
+        } catch (error) {
+          console.error("Supabase thread delete failed", error);
+          return new Response("Could not delete thread", { status: 503 });
+        }
       },
     },
   },

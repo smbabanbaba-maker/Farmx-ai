@@ -56,14 +56,15 @@ export const Route = createFileRoute("/api/chat")({
               );
             }
           } else {
-            const quota = await consumeQuota(viewer, hasImage ? "scans" : "messages");
+            const quota = await consumeQuota(request, viewer, hasImage ? "scans" : "messages");
             if (!quota.ok) return new Response(quota.message, { status: 402 });
           }
         } catch (error) {
           console.error("Viewer or quota check failed", error);
           return Response.json(
             {
-              error: "Database is not configured. Connect Neon Postgres in Vercel, then redeploy.",
+              error:
+                "Supabase data service is not configured. Add the Supabase URL and publishable key, then redeploy.",
             },
             { status: 503 },
           );

@@ -43,3 +43,13 @@
 - [x] Add tests for the image-generation route and prompt handling
 - [x] Verify image generation locally and in Vercel production
 - [ ] Push the image-generation feature to GitHub and trigger a Vercel deployment
+
+# Current request — image reliability and Supabase completion
+
+- [x] Diagnose why the deployed `/api/generate-image` route does not return an image
+- [x] Make Manus ImageService/Gemini image generation return a browser-renderable result with clear errors and loading behavior
+- [x] Verify Supabase environment configuration and client/server auth wiring
+- [x] Complete or correct Supabase schema for profiles, chat history, usage, and subscriptions without committing secrets
+- [ ] Verify registration, login, logout, session restoration, and protected API behavior against the user's Supabase project
+- [x] Run unit tests, TypeScript checks, production build, and live endpoint checks
+- [ ] Push the corrected image and Supabase changes to GitHub

@@ -1,3 +1,5 @@
+import { supabaseDataRequest } from "@/lib/supabase-data.server";
+
 const ACCESS_COOKIE = "farmx_access_token";
 const REFRESH_COOKIE = "farmx_refresh_token";
 const SESSION_COOKIE = "farmx_session";
@@ -113,7 +115,21 @@ export async function getSessionUser(request: Request): Promise<SessionUser | nu
     email?: string | null;
   } | null;
   if (!body?.id) return null;
-  return { id: body.id, email: body.email ?? "", plan: "free", plan_expires_at: null };
+  let profile: { plan?: string; plan_expires_at?: string | null } | undefined;
+  try {
+    const rows = await supabaseDataRequest<
+      Array<{ plan?: string; plan_expires_at?: string | null }>
+    >(request, `profiles?id=eq.${encodeURIComponent(body.id)}&select=plan,plan_expires_at&limit=1`);
+    profile = rows[0];
+  } catch {
+    // Auth remains usable while the optional profile migration is being applied.
+  }
+  return {
+    id: body.id,
+    email: body.email ?? "",
+    plan: profile?.plan ?? "free",
+    plan_expires_at: profile?.plan_expires_at ?? null,
+  };
 }
 
 export { ACCESS_COOKIE, REFRESH_COOKIE };
