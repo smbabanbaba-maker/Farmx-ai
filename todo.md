@@ -68,4 +68,12 @@
 - [x] Audit the live deployment for unrelated UI, routes, or metadata
 - [x] Remove only confirmed unrelated code and restore FarmX AI as the sole application
 - [x] Verify FarmX chat, image route, auth, history controls, branding, and navigation remain intact
-- [ ] Run tests and production build, then push the cleaned project to GitHub
+- [x] Run tests and production build, then push the cleaned project to GitHub
+
+# Current request — verify Supabase database integration
+
+- [x] Compare Supabase migration tables, columns, indexes, RLS, trigger, RPC, and Storage bucket with application queries
+- [ ] Check whether the live Supabase project tables and policies are accessible and working from the user's authenticated Supabase project session
+- [x] Fix any schema or application integration mismatches found
+- [x] Run database-related tests, TypeScript, and production build
+- [x] Report which Supabase features are verified and what still requires the user's project access

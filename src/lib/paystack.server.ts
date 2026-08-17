@@ -1,4 +1,4 @@
-import { ensureSchema, query } from "@/lib/db.server";
+import { supabaseAdminRequest } from "@/lib/supabase-data.server";
 import { isPaidPlan, type PlanId } from "@/lib/plans";
 
 export type PaystackTx = {
@@ -10,29 +10,40 @@ export type PaystackTx = {
   metadata?: { plan?: string; user_id?: string };
 };
 
+type StoredPayment = { user_id: string; plan: string; status: string };
+
 export async function applySuccessfulPayment(tx: PaystackTx): Promise<boolean> {
   const reference = tx.reference;
   if (!reference || tx.status !== "success") return false;
-  await ensureSchema();
-  const result = await query<{ user_id: string; plan: string; status: string }>(
-    "SELECT user_id, plan, status FROM payments WHERE reference = $1",
-    [reference],
+
+  const payments = await supabaseAdminRequest<StoredPayment[]>(
+    `payments?reference=eq.${encodeURIComponent(reference)}&select=user_id,plan,status&limit=1`,
   );
-  const payment = result.rows[0];
+  const payment = payments[0];
   const plan = (payment?.plan ?? tx.metadata?.plan) as PlanId | undefined;
   const userId = payment?.user_id ?? tx.metadata?.user_id;
   if (!plan || !isPaidPlan(plan) || !userId) return false;
 
   if (payment?.status !== "success") {
-    await query(
-      "UPDATE payments SET status = 'success', channel = $2, paid_at = COALESCE($3::timestamptz, NOW()) WHERE reference = $1",
-      [reference, tx.channel ?? null, tx.paid_at ?? null],
-    );
+    await supabaseAdminRequest(`payments?reference=eq.${encodeURIComponent(reference)}`, {
+      method: "PATCH",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({
+        status: "success",
+        channel: tx.channel ?? null,
+        paid_at: tx.paid_at ?? new Date().toISOString(),
+      }),
+    });
   }
-  await query(
-    "UPDATE profiles SET plan = $2, plan_expires_at = NOW() + INTERVAL '30 days' WHERE id = $1",
-    [userId, plan],
-  );
+
+  await supabaseAdminRequest(`profiles?id=eq.${encodeURIComponent(userId)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({
+      plan,
+      plan_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    }),
+  });
   return true;
 }
 

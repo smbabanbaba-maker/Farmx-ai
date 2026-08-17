@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getViewer, SIGN_IN_REQUIRED } from "@/lib/entitlements.server";
-import { ensureSchema, query } from "@/lib/db.server";
+import { supabaseAdminRequest } from "@/lib/supabase-data.server";
 import { PLAN_PRICE_KOBO, isPaidPlan } from "@/lib/plans";
 
 export const Route = createFileRoute("/api/pay/init")({
@@ -40,11 +40,18 @@ export const Route = createFileRoute("/api/pay/init")({
           console.error("Paystack init failed", resp.status, body.message);
           return new Response(body.message ?? "Could not start payment.", { status: 502 });
         }
-        await ensureSchema();
-        await query(
-          "INSERT INTO payments (reference, user_id, email, plan, amount_kobo, status) VALUES ($1, $2, $3, $4, $5, 'pending')",
-          [reference, viewer.userId, viewer.email, plan, amount],
-        );
+        await supabaseAdminRequest("payments", {
+          method: "POST",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({
+            reference,
+            user_id: viewer.userId,
+            email: viewer.email,
+            plan,
+            amount_kobo: amount,
+            status: "pending",
+          }),
+        });
         return Response.json({ authorization_url: body.data.authorization_url, reference });
       },
     },
