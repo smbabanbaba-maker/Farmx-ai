@@ -26,6 +26,7 @@ import { Route as ApiEntitlementRouteImport } from './routes/api/entitlement'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
 import { Route as ApiThreadsRouteImport } from './routes/api/threads'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
+import { Route as ApiAgroguardAnalyzeRouteImport } from './routes/api/agroguard/analyze'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth.login'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth.logout'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth.signup'
@@ -118,6 +119,11 @@ const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   path: '/api/transcribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAgroguardAnalyzeRoute = ApiAgroguardAnalyzeRouteImport.update({
+  id: '/api/agroguard/analyze',
+  path: '/api/agroguard/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/agroguard/analyze': typeof ApiAgroguardAnalyzeRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/agroguard/analyze': typeof ApiAgroguardAnalyzeRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/agroguard/analyze': typeof ApiAgroguardAnalyzeRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/api/threads'
     | '/api/transcribe'
+    | '/api/agroguard/analyze'
     | '/api/auth/login'
     | '/api/auth/logout'
     | '/api/auth/signup'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/api/threads'
     | '/api/transcribe'
+    | '/api/agroguard/analyze'
     | '/api/auth/login'
     | '/api/auth/logout'
     | '/api/auth/signup'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/api/threads'
     | '/api/transcribe'
+    | '/api/agroguard/analyze'
     | '/api/auth/login'
     | '/api/auth/logout'
     | '/api/auth/signup'
@@ -322,6 +334,7 @@ export interface RootRouteChildren {
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
   ApiThreadsRoute: typeof ApiThreadsRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
+  ApiAgroguardAnalyzeRoute: typeof ApiAgroguardAnalyzeRoute
   ApiPayInitRoute: typeof ApiPayInitRoute
   ApiPayVerifyRoute: typeof ApiPayVerifyRoute
   ApiPublicPaystackWebhookRoute: typeof ApiPublicPaystackWebhookRoute
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTranscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/agroguard/analyze': {
+      id: '/api/agroguard/analyze'
+      path: '/api/agroguard/analyze'
+      fullPath: '/api/agroguard/analyze'
+      preLoaderRoute: typeof ApiAgroguardAnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/login': {
       id: '/api/auth/login'
       path: '/login'
@@ -526,6 +546,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGenerateImageRoute: ApiGenerateImageRoute,
   ApiThreadsRoute: ApiThreadsRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
+  ApiAgroguardAnalyzeRoute: ApiAgroguardAnalyzeRoute,
   ApiPayInitRoute: ApiPayInitRoute,
   ApiPayVerifyRoute: ApiPayVerifyRoute,
   ApiPublicPaystackWebhookRoute: ApiPublicPaystackWebhookRoute,

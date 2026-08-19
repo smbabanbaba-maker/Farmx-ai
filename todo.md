@@ -77,3 +77,12 @@
 - [x] Fix any schema or application integration mismatches found
 - [x] Run database-related tests, TypeScript, and production build
 - [x] Report which Supabase features are verified and what still requires the user's project access
+
+# Current request — isolated AgroGuard POC branch
+
+- [x] Create isolated branch `agroguard-poc` from the cleaned FarmX baseline without changing `main`
+- [x] Build tomato crop-health image upload/camera preview and real Gemini vision analysis endpoint
+- [x] Add structured result display with condition, confidence, severity, observations, recommendations, and expert warning
+- [x] Add AgroGuard dashboard sections for Home, Crop Health, Weather placeholder, Ask AgroGuard, and My Farm
+- [x] Add standalone AgroGuard logo/branding and responsive mobile-first styling
+- [ ] Run tests and production build, then push the isolated branch to GitHub
