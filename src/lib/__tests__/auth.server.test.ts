@@ -59,9 +59,23 @@ describe("Supabase auth helpers", () => {
       }),
     );
 
-    const result = await signUpWithSupabase("new@example.com", "password123");
+    const result = await signUpWithSupabase(
+      "new@example.com",
+      "password123",
+      "https://farmx-ai-one.vercel.app/auth",
+    );
     expect(result.user?.id).toBe("user-2");
     expect(result.session).toBeUndefined();
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://example.supabase.co/auth/v1/signup",
+      expect.objectContaining({
+        body: JSON.stringify({
+          email: "new@example.com",
+          password: "password123",
+          options: { emailRedirectTo: "https://farmx-ai-one.vercel.app/auth" },
+        }),
+      }),
+    );
   });
 
   it("resolves the current user from the Supabase access-token cookie", async () => {

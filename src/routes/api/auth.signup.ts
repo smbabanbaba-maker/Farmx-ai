@@ -15,11 +15,24 @@ export const Route = createFileRoute("/api/auth/signup")({
               { status: 400 },
             );
           }
-          const data = await signUpWithSupabase(email, password);
+          const origin = new URL(request.url).origin;
+          const data = await signUpWithSupabase(email, password, `${origin}/auth`);
           if (!data.user) {
             return Response.json(
-              { error: "Supabase did not create the account." },
-              { status: 400 },
+              {
+                error:
+                  "An kasa ƙirƙirar sabon account da wannan email. Idan kana da account ɗin a baya, danna Sign in. Idan ba haka ba, jira seconds 60 sannan ka sake gwadawa sau ɗaya.",
+              },
+              { status: 409 },
+            );
+          }
+          if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+            return Response.json(
+              {
+                error:
+                  "Wannan email yana da FarmX AI account a baya. Danna Sign in maimakon Create account.",
+              },
+              { status: 409 },
             );
           }
           if (!data.session) {

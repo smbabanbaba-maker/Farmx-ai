@@ -8,7 +8,7 @@ type SupabaseAuthResponse = {
   access_token?: string;
   refresh_token?: string;
   session?: { access_token: string; refresh_token: string };
-  user?: { id: string; email?: string | null };
+  user?: { id: string; email?: string | null; identities?: unknown[] };
   error?: string;
   error_description?: string;
   msg?: string;
@@ -78,12 +78,20 @@ export function sessionCookie(token: string, maxAge = 60 * 60 * 24 * 30) {
   return `${SESSION_COOKIE}=${token}; ${cookieOptions(maxAge)}`;
 }
 
-export async function signUpWithSupabase(email: string, password: string) {
+export async function signUpWithSupabase(
+  email: string,
+  password: string,
+  emailRedirectTo?: string,
+) {
   const { url } = getSupabaseConfig();
   const response = await fetch(`${url}/auth/v1/signup`, {
     method: "POST",
     headers: supabaseHeaders(),
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({
+      email,
+      password,
+      ...(emailRedirectTo ? { options: { emailRedirectTo } } : {}),
+    }),
   });
   return readAuthResponse(response);
 }

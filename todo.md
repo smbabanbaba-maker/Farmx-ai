@@ -77,3 +77,11 @@
 - [x] Fix any schema or application integration mismatches found
 - [x] Run database-related tests, TypeScript, and production build
 - [x] Report which Supabase features are verified and what still requires the user's project access
+
+# Current request — fix Supabase registration failure
+
+- [x] Inspect the live registration error, signup route, and required Vercel Supabase variables
+- [x] Verify Supabase Auth email provider and URL configuration for the FarmX deployment
+- [x] Fix the registration route and user-facing error message if needed
+- [x] Verify signup creates an Auth user and a matching `profiles` row
+- [x] Run tests/build and push the registration fix to GitHub
