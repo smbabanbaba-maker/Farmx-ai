@@ -92,3 +92,10 @@
 - [x] Add a password-recovery flow and clearer existing-account sign-in guidance
 - [x] Backfill the matching profile record for the existing Auth user
 - [x] Run tests/build and push the authentication unblocker to GitHub
+
+# Current request — finish live Supabase Auth configuration
+
+- [x] Inspect live Auth users, email/password provider, confirmation behavior, URL configuration, and logs
+- [x] Apply safe Supabase Auth URL configuration corrections in the FarmX project
+- [x] Verify deployed password-recovery and password-update endpoints respond on Vercel
+- [x] Deliver the exact Hausa steps the user must finish in Supabase and Vercel
