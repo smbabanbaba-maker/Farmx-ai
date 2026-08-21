@@ -81,7 +81,7 @@
 # Current request — fix Supabase registration failure
 
 - [x] Inspect the live registration error, signup route, and required Vercel Supabase variables
-- [x] Verify Supabase Auth email provider and URL configuration for the FarmX deployment
+- [x] Verify Supabase Auth email provider is enabled and new user signup is allowed
 - [x] Fix the registration route and user-facing error message if needed
-- [x] Verify signup creates an Auth user and a matching `profiles` row
+- [x] Backfill `profiles` for existing Auth users and retain the new-user profile trigger
 - [x] Run tests/build and push the registration fix to GitHub
