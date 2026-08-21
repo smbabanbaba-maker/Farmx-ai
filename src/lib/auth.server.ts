@@ -14,6 +14,11 @@ type SupabaseAuthResponse = {
   msg?: string;
 };
 
+type SupabaseSessionTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 type SessionUser = {
   id: string;
   email: string;
@@ -66,6 +71,20 @@ export function authCookies(accessToken: string, refreshToken: string) {
     `${ACCESS_COOKIE}=${accessToken}; ${options}`,
     `${REFRESH_COOKIE}=${refreshToken}; ${options}`,
   ];
+}
+
+/**
+ * Supabase's password-grant and auto-confirm signup responses return tokens at
+ * the top level. Keep support for a nested `session` object as a compatibility
+ * fallback for clients/tests that use that shape.
+ */
+export function getSupabaseSessionTokens(
+  response: SupabaseAuthResponse,
+): SupabaseSessionTokens | null {
+  const accessToken = response.access_token ?? response.session?.access_token;
+  const refreshToken = response.refresh_token ?? response.session?.refresh_token;
+  if (!accessToken || !refreshToken) return null;
+  return { accessToken, refreshToken };
 }
 
 export function clearAuthCookies() {

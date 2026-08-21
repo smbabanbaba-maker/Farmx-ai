@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   authCookies,
+  getSupabaseSessionTokens,
   getSessionUser,
   requestPasswordRecovery,
   sessionCookie,
@@ -52,6 +53,27 @@ describe("Supabase auth helpers", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(authCookies("access-token", "refresh-token")).toHaveLength(2);
+  });
+
+  it("extracts tokens from Supabase's top-level password-grant response", () => {
+    expect(
+      getSupabaseSessionTokens({
+        access_token: "access-token",
+        refresh_token: "refresh-token",
+      }),
+    ).toEqual({ accessToken: "access-token", refreshToken: "refresh-token" });
+  });
+
+  it("keeps compatibility with nested Supabase session responses", () => {
+    expect(
+      getSupabaseSessionTokens({
+        session: { access_token: "nested-access", refresh_token: "nested-refresh" },
+      }),
+    ).toEqual({ accessToken: "nested-access", refreshToken: "nested-refresh" });
+  });
+
+  it("does not create a session when either token is absent", () => {
+    expect(getSupabaseSessionTokens({ access_token: "access-only" })).toBeNull();
   });
 
   it("returns a confirmation-required signup response when Supabase has no session", async () => {

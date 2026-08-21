@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { authCookies, signInWithSupabase } from "@/lib/auth.server";
+import { authCookies, getSupabaseSessionTokens, signInWithSupabase } from "@/lib/auth.server";
 
 export const Route = createFileRoute("/api/auth/login")({
   server: {
@@ -13,14 +13,15 @@ export const Route = createFileRoute("/api/auth/login")({
             return Response.json({ error: "Enter your email and password." }, { status: 400 });
           }
           const data = await signInWithSupabase(email, password);
-          if (!data.user || !data.session) {
+          const sessionTokens = getSupabaseSessionTokens(data);
+          if (!data.user || !sessionTokens) {
             return Response.json({ error: "Supabase did not return a session." }, { status: 401 });
           }
           const response = Response.json(
             { user: { id: data.user.id, email: data.user.email ?? email } },
             { headers: { "Cache-Control": "no-store" } },
           );
-          for (const cookie of authCookies(data.session.access_token, data.session.refresh_token)) {
+          for (const cookie of authCookies(sessionTokens.accessToken, sessionTokens.refreshToken)) {
             response.headers.append("Set-Cookie", cookie);
           }
           return response;

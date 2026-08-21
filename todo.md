@@ -99,3 +99,12 @@
 - [x] Apply safe Supabase Auth URL configuration corrections in the FarmX project
 - [x] Verify deployed password-recovery and password-update endpoints respond on Vercel
 - [x] Deliver the exact Hausa steps the user must finish in Supabase and Vercel
+
+# Current request — fix missing Supabase login session
+
+- [x] Inspect login route, Supabase password-sign-in response, and session cookie logic
+- [x] Reproduce the live missing-session response without exposing the user's credentials
+- [x] Fix session/token extraction and secure cookie creation
+- [ ] Verify authenticated profile access after login
+- [x] Run tests and production build for the login-session fix
+- [ ] Push the login-session fix and verify it on Vercel
