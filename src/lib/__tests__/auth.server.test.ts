@@ -6,6 +6,7 @@ import {
   sessionCookie,
   signInWithSupabase,
   signUpWithSupabase,
+  updateSupabasePassword,
 } from "../auth.server";
 import { hashToken, newId } from "../db.server";
 
@@ -94,6 +95,22 @@ describe("Supabase auth helpers", () => {
           email: "user@example.com",
           options: { redirectTo: "https://farmx-ai-one.vercel.app/auth" },
         }),
+      }),
+    );
+  });
+
+  it("updates a password with the recovery access token", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ user: { id: "user-4" } }), { status: 200 }),
+    );
+
+    await updateSupabasePassword("recovery-token", "new-password-123");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://example.supabase.co/auth/v1/user",
+      expect.objectContaining({
+        method: "PUT",
+        body: JSON.stringify({ password: "new-password-123" }),
       }),
     );
   });

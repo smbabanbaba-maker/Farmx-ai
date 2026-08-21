@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/auth/reset-password")({
           }
 
           const origin = new URL(request.url).origin;
-          await requestPasswordRecovery(email, `${origin}/auth`);
+          await requestPasswordRecovery(email, `${origin}/reset-password`);
           return Response.json({
             message:
               "Idan email ɗin yana da FarmX AI account, an tura password-reset link zuwa inbox ɗinka. Duba Spam folder ma.",

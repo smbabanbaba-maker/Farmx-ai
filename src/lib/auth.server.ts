@@ -119,6 +119,16 @@ export async function requestPasswordRecovery(email: string, emailRedirectTo: st
   return readAuthResponse(response);
 }
 
+export async function updateSupabasePassword(accessToken: string, password: string) {
+  const { url } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/user`, {
+    method: "PUT",
+    headers: supabaseHeaders(accessToken),
+    body: JSON.stringify({ password }),
+  });
+  return readAuthResponse(response);
+}
+
 export async function signOutFromSupabase(_request: Request) {
   return undefined;
 }

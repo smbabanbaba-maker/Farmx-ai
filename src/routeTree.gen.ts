@@ -17,6 +17,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as PlansRouteImport } from './routes/plans'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -30,6 +31,7 @@ import { Route as ApiAuthLoginRouteImport } from './routes/api/auth.login'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth.logout'
 import { Route as ApiAuthResetPasswordRouteImport } from './routes/api/auth.reset-password'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth.signup'
+import { Route as ApiAuthUpdatePasswordRouteImport } from './routes/api/auth.update-password'
 import { Route as ApiPayInitRouteImport } from './routes/api/pay.init'
 import { Route as ApiPayVerifyRouteImport } from './routes/api/pay.verify'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
@@ -72,6 +74,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScanRoute = ScanRouteImport.update({
@@ -139,6 +146,11 @@ const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => ApiAuthRoute,
 } as any)
+const ApiAuthUpdatePasswordRoute = ApiAuthUpdatePasswordRouteImport.update({
+  id: '/update-password',
+  path: '/update-password',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
 const ApiPayInitRoute = ApiPayInitRouteImport.update({
   id: '/api/pay/init',
   path: '/api/pay/init',
@@ -165,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/plans': typeof PlansRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
@@ -178,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/auth/update-password': typeof ApiAuthUpdatePasswordRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
@@ -191,6 +205,7 @@ export interface FileRoutesByTo {
   '/plans': typeof PlansRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
@@ -204,6 +219,7 @@ export interface FileRoutesByTo {
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/auth/update-password': typeof ApiAuthUpdatePasswordRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
@@ -218,6 +234,7 @@ export interface FileRoutesById {
   '/plans': typeof PlansRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/scan': typeof ScanRoute
   '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
@@ -231,6 +248,7 @@ export interface FileRoutesById {
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/auth/update-password': typeof ApiAuthUpdatePasswordRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
@@ -246,6 +264,7 @@ export interface FileRouteTypes {
     | '/plans'
     | '/privacy'
     | '/profile'
+    | '/reset-password'
     | '/scan'
     | '/settings'
     | '/terms'
@@ -259,6 +278,7 @@ export interface FileRouteTypes {
     | '/api/auth/logout'
     | '/api/auth/reset-password'
     | '/api/auth/signup'
+    | '/api/auth/update-password'
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
@@ -272,6 +292,7 @@ export interface FileRouteTypes {
     | '/plans'
     | '/privacy'
     | '/profile'
+    | '/reset-password'
     | '/scan'
     | '/settings'
     | '/terms'
@@ -285,6 +306,7 @@ export interface FileRouteTypes {
     | '/api/auth/logout'
     | '/api/auth/reset-password'
     | '/api/auth/signup'
+    | '/api/auth/update-password'
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
@@ -298,6 +320,7 @@ export interface FileRouteTypes {
     | '/plans'
     | '/privacy'
     | '/profile'
+    | '/reset-password'
     | '/scan'
     | '/settings'
     | '/terms'
@@ -311,6 +334,7 @@ export interface FileRouteTypes {
     | '/api/auth/logout'
     | '/api/auth/reset-password'
     | '/api/auth/signup'
+    | '/api/auth/update-password'
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
@@ -325,6 +349,7 @@ export interface RootRouteChildren {
   PlansRoute: typeof PlansRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ScanRoute: typeof ScanRoute
   SettingsRoute: typeof SettingsRoute
   TermsRoute: typeof TermsRoute
@@ -395,6 +420,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scan': {
@@ -488,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSignupRouteImport
       parentRoute: typeof ApiAuthRoute
     }
+    '/api/auth/update-password': {
+      id: '/api/auth/update-password'
+      path: '/update-password'
+      fullPath: '/api/auth/update-password'
+      preLoaderRoute: typeof ApiAuthUpdatePasswordRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
     '/api/pay/init': {
       id: '/api/pay/init'
       path: '/api/pay/init'
@@ -517,6 +556,7 @@ interface ApiAuthRouteChildren {
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
   ApiAuthResetPasswordRoute: typeof ApiAuthResetPasswordRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiAuthUpdatePasswordRoute: typeof ApiAuthUpdatePasswordRoute
 }
 
 const ApiAuthRouteChildren: ApiAuthRouteChildren = {
@@ -524,6 +564,7 @@ const ApiAuthRouteChildren: ApiAuthRouteChildren = {
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
   ApiAuthResetPasswordRoute: ApiAuthResetPasswordRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiAuthUpdatePasswordRoute: ApiAuthUpdatePasswordRoute,
 }
 
 const ApiAuthRouteWithChildren =
@@ -538,6 +579,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlansRoute: PlansRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ScanRoute: ScanRoute,
   SettingsRoute: SettingsRoute,
   TermsRoute: TermsRoute,
