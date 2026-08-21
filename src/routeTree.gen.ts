@@ -28,6 +28,7 @@ import { Route as ApiThreadsRouteImport } from './routes/api/threads'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth.login'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth.logout'
+import { Route as ApiAuthResetPasswordRouteImport } from './routes/api/auth.reset-password'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth.signup'
 import { Route as ApiPayInitRouteImport } from './routes/api/pay.init'
 import { Route as ApiPayVerifyRouteImport } from './routes/api/pay.verify'
@@ -128,6 +129,11 @@ const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
   path: '/logout',
   getParentRoute: () => ApiAuthRoute,
 } as any)
+const ApiAuthResetPasswordRoute = ApiAuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/api/transcribe': typeof ApiTranscribeRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/auth/login'
     | '/api/auth/logout'
+    | '/api/auth/reset-password'
     | '/api/auth/signup'
     | '/api/pay/init'
     | '/api/pay/verify'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/auth/login'
     | '/api/auth/logout'
+    | '/api/auth/reset-password'
     | '/api/auth/signup'
     | '/api/pay/init'
     | '/api/pay/verify'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/api/transcribe'
     | '/api/auth/login'
     | '/api/auth/logout'
+    | '/api/auth/reset-password'
     | '/api/auth/signup'
     | '/api/pay/init'
     | '/api/pay/verify'
@@ -462,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthLogoutRouteImport
       parentRoute: typeof ApiAuthRoute
     }
+    '/api/auth/reset-password': {
+      id: '/api/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/api/auth/reset-password'
+      preLoaderRoute: typeof ApiAuthResetPasswordRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
     '/api/auth/signup': {
       id: '/api/auth/signup'
       path: '/signup'
@@ -496,12 +515,14 @@ declare module '@tanstack/react-router' {
 interface ApiAuthRouteChildren {
   ApiAuthLoginRoute: typeof ApiAuthLoginRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthResetPasswordRoute: typeof ApiAuthResetPasswordRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
 }
 
 const ApiAuthRouteChildren: ApiAuthRouteChildren = {
   ApiAuthLoginRoute: ApiAuthLoginRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthResetPasswordRoute: ApiAuthResetPasswordRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
 }
 

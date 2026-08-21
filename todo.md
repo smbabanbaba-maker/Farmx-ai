@@ -88,7 +88,7 @@
 
 # Current request — resolve existing-account login blocker
 
-- [ ] Inspect the existing Supabase Auth account status and confirmation state
-- [ ] Add a password-recovery flow and clearer existing-account sign-in guidance
-- [ ] Verify login creates a FarmX session and exposes the matching profile
-- [ ] Run tests/build and push the authentication unblocker to GitHub
+- [x] Inspect the existing Supabase Auth account status and confirmation state
+- [x] Add a password-recovery flow and clearer existing-account sign-in guidance
+- [x] Backfill the matching profile record for the existing Auth user
+- [x] Run tests/build and push the authentication unblocker to GitHub
