@@ -106,6 +106,19 @@ export async function signInWithSupabase(email: string, password: string) {
   return readAuthResponse(response);
 }
 
+export async function requestPasswordRecovery(email: string, emailRedirectTo: string) {
+  const { url } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/recover`, {
+    method: "POST",
+    headers: supabaseHeaders(),
+    body: JSON.stringify({
+      email,
+      options: { redirectTo: emailRedirectTo },
+    }),
+  });
+  return readAuthResponse(response);
+}
+
 export async function signOutFromSupabase(_request: Request) {
   return undefined;
 }

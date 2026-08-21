@@ -85,3 +85,10 @@
 - [x] Fix the registration route and user-facing error message if needed
 - [x] Backfill `profiles` for existing Auth users and retain the new-user profile trigger
 - [x] Run tests/build and push the registration fix to GitHub
+
+# Current request — resolve existing-account login blocker
+
+- [ ] Inspect the existing Supabase Auth account status and confirmation state
+- [ ] Add a password-recovery flow and clearer existing-account sign-in guidance
+- [ ] Verify login creates a FarmX session and exposes the matching profile
+- [ ] Run tests/build and push the authentication unblocker to GitHub

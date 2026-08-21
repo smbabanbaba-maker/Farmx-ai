@@ -25,6 +25,29 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const requestReset = async () => {
+    const normalizedEmail = email.trim();
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      toast.error("Shigar da email ɗinka kafin ka nemi password reset.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail }),
+      });
+      const data = (await response.json().catch(() => ({}))) as { error?: string; message?: string };
+      if (!response.ok) throw new Error(data.error ?? "An kasa tura password-reset link.");
+      toast.success(data.message ?? "Duba email ɗinka domin password-reset link.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "An kasa tura password-reset link.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!email.trim() || password.length < 6) {
@@ -113,6 +136,17 @@ function AuthPage() {
             {busy && <Loader2 size={16} className="animate-spin" />}
             {mode === "signin" ? "Sign in" : "Create account"}
           </Button>
+          {mode === "signin" && (
+            <Button
+              type="button"
+              variant="link"
+              disabled={busy}
+              onClick={requestReset}
+              className="h-auto w-full p-0 text-xs text-muted-foreground"
+            >
+              Forgot password?
+            </Button>
+          )}
         </form>
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {mode === "signin" ? "New to FarmX AI?" : "Already have an account?"}{" "}

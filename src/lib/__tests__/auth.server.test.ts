@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   authCookies,
   getSessionUser,
+  requestPasswordRecovery,
   sessionCookie,
   signInWithSupabase,
   signUpWithSupabase,
@@ -73,6 +74,25 @@ describe("Supabase auth helpers", () => {
           email: "new@example.com",
           password: "password123",
           options: { emailRedirectTo: "https://farmx-ai-one.vercel.app/auth" },
+        }),
+      }),
+    );
+  });
+
+  it("requests a password recovery email with the FarmX auth redirect", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({}), { status: 200 }),
+    );
+
+    await requestPasswordRecovery("user@example.com", "https://farmx-ai-one.vercel.app/auth");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://example.supabase.co/auth/v1/recover",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          email: "user@example.com",
+          options: { redirectTo: "https://farmx-ai-one.vercel.app/auth" },
         }),
       }),
     );
