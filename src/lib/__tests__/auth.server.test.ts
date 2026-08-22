@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   authCookies,
+  getGoogleOAuthAuthorizationUrl,
   getSupabaseSessionTokens,
+  getSupabaseUserFromAccessToken,
   getSessionUser,
   requestPasswordRecovery,
   sessionCookie,
@@ -53,6 +55,25 @@ describe("Supabase auth helpers", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(authCookies("access-token", "refresh-token")).toHaveLength(2);
+  });
+
+  it("builds a Google authorization URL with the approved callback destination", () => {
+    const url = new URL(getGoogleOAuthAuthorizationUrl("https://farmx-ai-one.vercel.app/auth-callback"));
+    expect(url.origin).toBe("https://example.supabase.co");
+    expect(url.pathname).toBe("/auth/v1/authorize");
+    expect(url.searchParams.get("provider")).toBe("google");
+    expect(url.searchParams.get("redirect_to")).toBe("https://farmx-ai-one.vercel.app/auth-callback");
+  });
+
+  it("verifies an OAuth access token with Supabase before creating application cookies", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ id: "google-user", email: "grower@example.com" }), { status: 200 }),
+    );
+
+    await expect(getSupabaseUserFromAccessToken("google-access-token")).resolves.toEqual({
+      id: "google-user",
+      email: "grower@example.com",
+    });
   });
 
   it("extracts tokens from Supabase's top-level password-grant response", () => {

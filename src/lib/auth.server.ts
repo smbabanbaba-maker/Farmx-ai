@@ -125,6 +125,34 @@ export async function signInWithSupabase(email: string, password: string) {
   return readAuthResponse(response);
 }
 
+export function getGoogleOAuthAuthorizationUrl(redirectTo: string) {
+  const { url } = getSupabaseConfig();
+  const authorizeUrl = new URL(`${url}/auth/v1/authorize`);
+  authorizeUrl.searchParams.set("provider", "google");
+  authorizeUrl.searchParams.set("redirect_to", redirectTo);
+  return authorizeUrl.toString();
+}
+
+export async function getSupabaseUserFromAccessToken(accessToken: string) {
+  const { url } = getSupabaseConfig();
+  const response = await fetch(`${url}/auth/v1/user`, {
+    headers: supabaseHeaders(accessToken),
+  });
+  const body = (await response.json().catch(() => ({}))) as {
+    id?: string;
+    email?: string | null;
+    error?: string;
+    error_description?: string;
+    msg?: string;
+  };
+  if (!response.ok || !body.id) {
+    throw new Error(
+      body.error_description ?? body.msg ?? body.error ?? "The sign-in session could not be verified.",
+    );
+  }
+  return { id: body.id, email: body.email ?? "" };
+}
+
 export async function requestPasswordRecovery(email: string, emailRedirectTo: string) {
   const { url } = getSupabaseConfig();
   const response = await fetch(`${url}/auth/v1/recover`, {
@@ -155,28 +183,24 @@ export async function signOutFromSupabase(_request: Request) {
 export async function getSessionUser(request: Request): Promise<SessionUser | null> {
   const accessToken = cookieValue(request, ACCESS_COOKIE);
   if (!accessToken) return null;
-  const { url } = getSupabaseConfig();
-  const response = await fetch(`${url}/auth/v1/user`, {
-    headers: supabaseHeaders(accessToken),
-  });
-  if (!response.ok) return null;
-  const body = (await response.json().catch(() => null)) as {
-    id?: string;
-    email?: string | null;
-  } | null;
-  if (!body?.id) return null;
+  let authUser: { id: string; email: string };
+  try {
+    authUser = await getSupabaseUserFromAccessToken(accessToken);
+  } catch {
+    return null;
+  }
   let profile: { plan?: string; plan_expires_at?: string | null } | undefined;
   try {
     const rows = await supabaseDataRequest<
       Array<{ plan?: string; plan_expires_at?: string | null }>
-    >(request, `profiles?id=eq.${encodeURIComponent(body.id)}&select=plan,plan_expires_at&limit=1`);
+    >(request, `profiles?id=eq.${encodeURIComponent(authUser.id)}&select=plan,plan_expires_at&limit=1`);
     profile = rows[0];
   } catch {
     // Auth remains usable while the optional profile migration is being applied.
   }
   return {
-    id: body.id,
-    email: body.email ?? "",
+    id: authUser.id,
+    email: authUser.email,
     plan: profile?.plan ?? "free",
     plan_expires_at: profile?.plan_expires_at ?? null,
   };

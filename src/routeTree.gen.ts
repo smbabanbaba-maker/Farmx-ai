@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthCallbackRouteImport } from './routes/auth-callback'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as PlansRouteImport } from './routes/plans'
@@ -27,6 +28,7 @@ import { Route as ApiEntitlementRouteImport } from './routes/api/entitlement'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
 import { Route as ApiThreadsRouteImport } from './routes/api/threads'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
+import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth.google'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth.login'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth.logout'
 import { Route as ApiAuthResetPasswordRouteImport } from './routes/api/auth.reset-password'
@@ -35,6 +37,7 @@ import { Route as ApiAuthUpdatePasswordRouteImport } from './routes/api/auth.upd
 import { Route as ApiPayInitRouteImport } from './routes/api/pay.init'
 import { Route as ApiPayVerifyRouteImport } from './routes/api/pay.verify'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
+import { Route as ApiAuthOauthCallbackRouteImport } from './routes/api/auth.oauth.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,6 +52,11 @@ const AboutRoute = AboutRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth-callback',
+  path: '/auth-callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -126,6 +134,11 @@ const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   path: '/api/transcribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthGoogleRoute = ApiAuthGoogleRouteImport.update({
+  id: '/google',
+  path: '/google',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
 const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -167,11 +180,17 @@ const ApiPublicPaystackWebhookRoute =
     path: '/api/public/paystack-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthOauthCallbackRoute = ApiAuthOauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => ApiAuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/chat': typeof ChatRoute
   '/help': typeof HelpRoute
   '/plans': typeof PlansRoute
@@ -187,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
@@ -195,11 +215,13 @@ export interface FileRoutesByFullPath {
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
+  '/api/auth/oauth/callback': typeof ApiAuthOauthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/chat': typeof ChatRoute
   '/help': typeof HelpRoute
   '/plans': typeof PlansRoute
@@ -215,6 +237,7 @@ export interface FileRoutesByTo {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
@@ -223,12 +246,14 @@ export interface FileRoutesByTo {
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
+  '/api/auth/oauth/callback': typeof ApiAuthOauthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/auth-callback': typeof AuthCallbackRoute
   '/chat': typeof ChatRoute
   '/help': typeof HelpRoute
   '/plans': typeof PlansRoute
@@ -244,6 +269,7 @@ export interface FileRoutesById {
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/threads': typeof ApiThreadsRoute
   '/api/transcribe': typeof ApiTranscribeRoute
+  '/api/auth/google': typeof ApiAuthGoogleRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
   '/api/auth/reset-password': typeof ApiAuthResetPasswordRoute
@@ -252,6 +278,7 @@ export interface FileRoutesById {
   '/api/pay/init': typeof ApiPayInitRoute
   '/api/pay/verify': typeof ApiPayVerifyRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
+  '/api/auth/oauth/callback': typeof ApiAuthOauthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -259,6 +286,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/auth-callback'
     | '/chat'
     | '/help'
     | '/plans'
@@ -274,6 +302,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/api/threads'
     | '/api/transcribe'
+    | '/api/auth/google'
     | '/api/auth/login'
     | '/api/auth/logout'
     | '/api/auth/reset-password'
@@ -282,11 +311,13 @@ export interface FileRouteTypes {
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
+    | '/api/auth/oauth/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/auth'
+    | '/auth-callback'
     | '/chat'
     | '/help'
     | '/plans'
@@ -302,6 +333,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/api/threads'
     | '/api/transcribe'
+    | '/api/auth/google'
     | '/api/auth/login'
     | '/api/auth/logout'
     | '/api/auth/reset-password'
@@ -310,11 +342,13 @@ export interface FileRouteTypes {
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
+    | '/api/auth/oauth/callback'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/auth'
+    | '/auth-callback'
     | '/chat'
     | '/help'
     | '/plans'
@@ -330,6 +364,7 @@ export interface FileRouteTypes {
     | '/api/generate-image'
     | '/api/threads'
     | '/api/transcribe'
+    | '/api/auth/google'
     | '/api/auth/login'
     | '/api/auth/logout'
     | '/api/auth/reset-password'
@@ -338,12 +373,14 @@ export interface FileRouteTypes {
     | '/api/pay/init'
     | '/api/pay/verify'
     | '/api/public/paystack-webhook'
+    | '/api/auth/oauth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   ChatRoute: typeof ChatRoute
   HelpRoute: typeof HelpRoute
   PlansRoute: typeof PlansRoute
@@ -385,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth-callback': {
+      id: '/auth-callback'
+      path: '/auth-callback'
+      fullPath: '/auth-callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -492,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTranscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/google': {
+      id: '/api/auth/google'
+      path: '/google'
+      fullPath: '/api/auth/google'
+      preLoaderRoute: typeof ApiAuthGoogleRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
     '/api/auth/login': {
       id: '/api/auth/login'
       path: '/login'
@@ -548,23 +599,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaystackWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/oauth/callback': {
+      id: '/api/auth/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/api/auth/oauth/callback'
+      preLoaderRoute: typeof ApiAuthOauthCallbackRouteImport
+      parentRoute: typeof ApiAuthRoute
+    }
   }
 }
 
 interface ApiAuthRouteChildren {
+  ApiAuthGoogleRoute: typeof ApiAuthGoogleRoute
   ApiAuthLoginRoute: typeof ApiAuthLoginRoute
   ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
   ApiAuthResetPasswordRoute: typeof ApiAuthResetPasswordRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
   ApiAuthUpdatePasswordRoute: typeof ApiAuthUpdatePasswordRoute
+  ApiAuthOauthCallbackRoute: typeof ApiAuthOauthCallbackRoute
 }
 
 const ApiAuthRouteChildren: ApiAuthRouteChildren = {
+  ApiAuthGoogleRoute: ApiAuthGoogleRoute,
   ApiAuthLoginRoute: ApiAuthLoginRoute,
   ApiAuthLogoutRoute: ApiAuthLogoutRoute,
   ApiAuthResetPasswordRoute: ApiAuthResetPasswordRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
   ApiAuthUpdatePasswordRoute: ApiAuthUpdatePasswordRoute,
+  ApiAuthOauthCallbackRoute: ApiAuthOauthCallbackRoute,
 }
 
 const ApiAuthRouteWithChildren =
@@ -574,6 +636,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   ChatRoute: ChatRoute,
   HelpRoute: HelpRoute,
   PlansRoute: PlansRoute,

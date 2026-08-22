@@ -10,16 +10,16 @@ export const Route = createFileRoute("/api/auth/update-password")({
           const accessToken = typeof body.accessToken === "string" ? body.accessToken : "";
           const password = typeof body.password === "string" ? body.password : "";
           if (!accessToken) {
-            return Response.json({ error: "Password reset link ɗin bai inganta ba ko ya ƙare." }, { status: 401 });
+            return Response.json({ error: "This password reset link is invalid or has expired." }, { status: 401 });
           }
           if (password.length < 6) {
-            return Response.json({ error: "Password dole ya zama akalla haruffa 6." }, { status: 400 });
+            return Response.json({ error: "Your password must be at least 6 characters long." }, { status: 400 });
           }
 
           await updateSupabasePassword(accessToken, password);
-          return Response.json({ message: "An canza password. Yanzu zaka iya Sign in." });
+          return Response.json({ message: "Your password has been updated. You can now sign in." });
         } catch (error) {
-          const message = error instanceof Error ? error.message : "An kasa canza password.";
+          const message = error instanceof Error ? error.message : "Unable to update your password.";
           return Response.json({ error: message }, { status: 400 });
         }
       },

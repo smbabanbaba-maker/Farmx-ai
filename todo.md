@@ -108,3 +108,15 @@
 - [ ] Verify authenticated profile access after login
 - [x] Run tests and production build for the login-session fix
 - [ ] Push the login-session fix and verify it on Vercel
+
+# Current request — polished English authentication and application cleanup
+
+- [x] Audit every FarmX route, component, navigation item, and user-facing message for confirmed unnecessary clutter
+- [x] Preserve FarmX core features while removing only confirmed redundant UI and dead account-flow elements
+- [x] Redesign the email/password sign-in and registration screens with clear English labels and accessibility states
+- [x] Add clear loading, success, validation, and actionable error feedback to all authentication actions
+- [x] Add secure Supabase Google OAuth sign-in start and callback/session completion support
+- [x] Add responsive visual verification and regression tests for login, registration, and OAuth callback states
+- [x] Run TypeScript, tests, and production build for the refined application
+- [ ] Push the refined application and verify the Vercel deployment
+- [ ] Add the Google provider credentials and approved callback URLs in live Supabase Auth configuration

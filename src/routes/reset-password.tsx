@@ -25,15 +25,15 @@ function ResetPasswordPage() {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!accessToken) {
-      toast.error("Password reset link ɗin bai inganta ba ko ya ƙare. Nemi sabon link.");
+        toast.error("This password reset link is invalid or has expired. Request a new link and try again.");
       return;
     }
     if (password.length < 6) {
-      toast.error("Password dole ya zama akalla haruffa 6.");
+        toast.error("Your password must be at least 6 characters long.");
       return;
     }
     if (password !== confirmPassword) {
-      toast.error("Passwords biyu ba su yi daidai ba.");
+        toast.error("Your two passwords do not match.");
       return;
     }
     setBusy(true);
@@ -44,11 +44,11 @@ function ResetPasswordPage() {
         body: JSON.stringify({ accessToken, password }),
       });
       const data = (await response.json().catch(() => ({}))) as { error?: string; message?: string };
-      if (!response.ok) throw new Error(data.error ?? "An kasa canza password.");
-      toast.success(data.message ?? "An canza password.");
+      if (!response.ok) throw new Error(data.error ?? "Unable to update your password.");
+      toast.success(data.message ?? "Your password has been updated.");
       navigate({ to: "/auth" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An kasa canza password.");
+      toast.error(error instanceof Error ? error.message : "Unable to update your password.");
     } finally {
       setBusy(false);
     }

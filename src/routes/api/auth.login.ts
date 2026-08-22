@@ -32,7 +32,7 @@ export const Route = createFileRoute("/api/auth/login")({
           return Response.json(
             {
               error: isCooldown
-                ? "Supabase yana neman ka jira kaɗan kafin sake login. Jira seconds 60, sannan ka gwada sau ɗaya kawai."
+                ? "Too many sign-in attempts. Wait 60 seconds, then try once more."
                 : message,
             },
             { status: isCooldown ? 429 : 401 },

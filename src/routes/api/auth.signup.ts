@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/auth/signup")({
             return Response.json(
               {
                 error:
-                  "An kasa ƙirƙirar sabon account da wannan email. Idan kana da account ɗin a baya, danna Sign in. Idan ba haka ba, jira seconds 60 sannan ka sake gwadawa sau ɗaya.",
+                  "We could not create an account with this email. If you already have an account, choose Sign in. Otherwise, wait 60 seconds and try once more.",
               },
               { status: 409 },
             );
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/api/auth/signup")({
             return Response.json(
               {
                 error:
-                  "Wannan email yana da FarmX AI account a baya. Danna Sign in maimakon Create account.",
+                  "An account already exists for this email. Choose Sign in instead of Create account.",
               },
               { status: 409 },
             );
@@ -57,7 +57,7 @@ export const Route = createFileRoute("/api/auth/signup")({
           return Response.json(
             {
               error: isCooldown
-                ? "Supabase yana neman ka jira kaɗan kafin sake register. Jira seconds 60, sannan ka gwada sau ɗaya kawai."
+                ? "Too many registration attempts. Wait 60 seconds, then try once more."
                 : message,
             },
             { status: isCooldown ? 429 : 400 },

@@ -87,9 +87,7 @@ const TOOLS: ToolItem[] = [
 
 const ACCOUNT: { label: string; icon: typeof Menu; to: string }[] = [
   { label: "Profile", icon: UserRound, to: "/profile" },
-  { label: "Upgrade to GO", icon: Sparkles, to: "/plans" },
-
-  { label: "Upgrade to PRO", icon: Crown, to: "/plans" },
+  { label: "Plans & Billing", icon: Crown, to: "/plans" },
   { label: "Settings", icon: Settings, to: "/settings" },
   { label: "Help & Support", icon: LifeBuoy, to: "/help" },
   { label: "Privacy Policy", icon: Shield, to: "/privacy" },
@@ -400,10 +398,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <p className="mt-6 px-3 text-center text-[10px] text-muted-foreground">
                 {isAuthenticated ? (
                   <span className="block pb-1 truncate text-foreground">
-                    {user?.email ?? "Signed in"}
+                    Signed in as {user?.email ?? "your FarmX account"}
                   </span>
                 ) : (
-                  <span className="block pb-1">Not signed in · chats stay on this device</span>
+                  <span className="block pb-1">Not signed in · chats are stored on this device</span>
                 )}
                 © {new Date().getFullYear()} SYLUTION LTD · v1.0.0
               </p>
